@@ -1,0 +1,66 @@
+<div class="sidebar">
+    <nav class="sidebar-nav">
+        <ul class="nav">
+            {# DASHBOARD #}
+            <li class="nav-item">
+                <a class="nav-link" href="/">
+                    <i class="nav-icon icon-speedometer"></i> Dashboard
+                    <span class="badge badge-primary"></span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/jadwal">
+                    <i class="nav-icon icon-calendar"></i> Manajemen Jadwal
+                    <span class="badge badge-primary"></span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'kelas-pelajar' %}">
+                    <i class="nav-icon icon-settings"></i> Manajemen Kelas
+                    <span class="badge badge-primary"></span>
+                </a>
+            </li>
+            {# Jadwal #}
+            <li class="divider"></li>
+            <li class="nav-title">Manajemen Jadwal</li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'penawaran-mata-pelajaran' %}">
+                    <i class="nav-icon icon-organization"></i> Pen. Mata Pelajaran</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'team-teaching' %}">
+                    <i class="nav-icon icon-link"></i> Team Teaching</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'jenis-kelas' %}">
+                    <i class="nav-icon icon-support"></i> Jenis Kelas</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'jam-pelajaran' %}">
+                    <i class="nav-icon icon-clock"></i> Jam Pelajaran</a>
+            </li>
+
+
+            {# Asset #}
+            <li class="divider"></li>
+            <li class="nav-title">Manajemen Asset</li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'master-pelajar' %}">
+                    <i class="nav-icon icon-people"></i> Pelajar</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'master-pelajaran' %}">
+                    <i class="nav-icon icon-notebook"></i> Pelajaran</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'master-pengajar' %}">
+                    <i class="nav-icon icon-eyeglass"></i> Pengajar</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'master-ruang' %}">
+                    <i class="nav-icon icon-bag"></i> Ruang</a>
+            </li>
+        </ul>
+    </nav>
+    <button class="sidebar-minimizer brand-minimizer" type="button"></button>
+</div>

@@ -1,0 +1,340 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+
+{% block app_css %}
+    <link rel="stylesheet" type="text/css" href="{% static "vendors/data-tables/datatables.css" %}"/>
+
+{% endblock app_css %}
+
+{% block breadcumb %}
+    <ol class="breadcrumb">
+        {% for link,name in breadcumbs %}
+            <li class="breadcrumb-item"><a href="{{ link }}">{{ name }}</a></li>
+        {% endfor %}
+    </ol>
+{% endblock breadcumb %}
+
+
+{% block app_script %}
+    <script type="text/javascript" charset="utf8"
+            src="{% static "vendors/data-tables/datatables.min.js" %}"></script>
+    <script>
+        $("#data_master").addClass("active")
+
+        $(document).ready(function () {
+            $('#data_table').DataTable();
+        });
+
+        $('#edit').onclick(function () {
+            alert("EDITED CLICKED")
+        })
+    </script>
+
+{% endblock app_script %}
+
+
+{% block container %}
+    <!-- /.row-->
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-header">Team Teaching</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="row">
+                                <div class="col-lg-2 col-sm-2">
+                                    <div class="callout callout-info">
+                                        <small class="text-muted">Jam Belajar</small>
+                                        <br>
+                                        <strong class="h4">{{ jamPelajaranDataCount }}</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-1" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- /.col-->
+                            </div>
+                            <hr class="mt-0">
+
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#modalTambah">
+                                        <i class="fa fa-plus"></i> Tambah Pelajar
+                                    </button>
+
+                                </div>
+                            </div>
+                            <br/>
+                            <hr class="mt-0">
+
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <i class="fa fa-align-justify"></i> Daftar Jam Pelajaran
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="data_table"
+                                                   class="table table-responsive-sm table-sm">
+                                                <thead>
+
+                                                <tr>
+                                                    <th>Shift</th>
+                                                    <th>Hari</th>
+                                                    <th>Mulai</th>
+                                                    <th>Selesai</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+
+
+                                                </thead>
+                                                <tbody>
+                                                {% for datum in data %}
+                                                    <tr>
+                                                        <td>{{ datum.shift_id.name }}</td>
+                                                        <td>
+
+                                                            {% ifequal datum.day 0 %}
+                                                                Minggu
+                                                            {% endifequal %}
+
+                                                            {% ifequal datum.day 1 %}
+                                                                Senin
+                                                            {% endifequal %}
+                                                            {% ifequal datum.day 2 %}
+                                                                Selasa
+                                                            {% endifequal %}
+                                                            {% ifequal datum.day 3 %}
+                                                                Rabu
+                                                            {% endifequal %}
+                                                            {% ifequal datum.day 4 %}
+                                                                Kamis
+                                                            {% endifequal %}
+                                                            {% ifequal datum.day 5 %}
+                                                                Jumat
+                                                            {% endifequal %}
+                                                            {% ifequal datum.day 6 %}
+                                                                Sabtu
+                                                            {% endifequal %}
+
+
+                                                        </td>
+                                                        <td>{{ datum.hour_start }}</td>
+                                                        <td>{{ datum.hour_stop }}</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-ghost-success"
+                                                                    data-toggle="modal"
+                                                                    data-target="#modalEdit{{ datum.pk }}">
+                                                                <i class="fa fa-edit"></i> Edit
+                                                            </button>
+
+
+                                                            {#  Modal Ubah Jam  #}
+                                                            <div class="modal fade" id="modalEdit{{ datum.pk }}"
+                                                                 tabindex="-1"
+                                                                 role="dialog"
+                                                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <form method="post"
+                                                                              action="{% url 'update-jam' %}">
+                                                                            <div class="modal-header">
+                                                                                <h5 class="modal-title"
+                                                                                    id="exampleModalLabel">Ubah Jam</h5>
+                                                                                <button type="button" class="close"
+                                                                                        data-dismiss="modal"
+                                                                                        aria-label="Close">
+                                                                                    <span aria-hidden="true">&times;</span>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                                                                {% csrf_token %}
+
+                                                                                <div class="form-group">
+                                                                                    <input class="form-control"
+                                                                                           id="timePk" name="timePk"
+                                                                                           type="hidden" required
+                                                                                           value="{{ datum.pk }}">
+                                                                                    <label for="registerno"></label>
+                                                                                    <label for="dayId">Hari</label>
+                                                                                    <select id="dayId" name="dayId"
+                                                                                            class="form-control"
+                                                                                            required>
+                                                                                        <option selected>Pilih Hari...
+                                                                                        </option>
+                                                                                        {% for data in hari %}
+                                                                                            {% ifequal datum.day data.0 %}
+                                                                                                <option value="{{ data.0 }}"
+                                                                                                        selected>{{ data.1 }}</option>
+                                                                                            {% else %}
+                                                                                                <option value="{{ data.0 }}"
+                                                                                                >{{ data.1 }}</option>
+                                                                                            {% endifequal %}
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="shiftId">Shift</label>
+                                                                                    <select id="shiftId" name="shiftId"
+                                                                                            class="form-control"
+                                                                                            required>
+                                                                                        <option selected>Pilih
+                                                                                            Shift...
+                                                                                        </option>
+                                                                                        {% for data in shift %}
+                                                                                            {% ifequal data.id datum.shift_id_id %}
+                                                                                                <option value="{{ data.pk }}"
+                                                                                                        selected>{{ data.name }}</option>
+                                                                                            {% else %}
+                                                                                                <option value="{{ data.pk }}">{{ data.name }}</option>
+                                                                                            {% endifequal %}
+                                                                                        {% endfor %}
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="timeStart">Jam
+                                                                                        Mulai</label>
+                                                                                    <input class="form-control"
+                                                                                           id="timeStart"
+                                                                                           name="timeStart"
+                                                                                           type="time" required
+                                                                                           placeholder=""
+                                                                                           value="{{ datum.hour_start.isoformat }}">
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="timeStop">Jam
+                                                                                        Selesai</label>
+                                                                                    <input class="form-control"
+                                                                                           id="timeStop" name="timeStop"
+                                                                                           type="time" required
+                                                                                           placeholder=""
+                                                                                           value="{{ datum.hour_stop.isoformat }}">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button"
+                                                                                        class="btn btn-secondary"
+                                                                                        data-dismiss="modal">
+                                                                                    Close
+                                                                                </button>
+                                                                                <button class="btn btn-success"
+                                                                                        type="submit"
+                                                                                        data-toggle="collapse"
+                                                                                        data-target="#collapseExample"
+                                                                                        aria-expanded="false"
+                                                                                        aria-controls="collapseExample">
+                                                                                    <i class="fa fa-save"></i> Simpan
+                                                                                </button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {#  Modal Delete #}
+                                                            <a href="{% url "drop-jam" %}?timePk={{ datum.pk }}"
+                                                               class="btn btn-sm btn-ghost-danger"
+                                                               onclick="return confirm('Data akan dihapus, Lanjutkan?');">
+                                                                <i class="fa fa-trash"></i> Hapus
+                                                            </a>
+
+                                                        </td>
+
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+    {#  Modal Tambah Jam  #}
+    <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="post" action="{% url 'store-jam' %}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Registrasi Pelajar</h5>
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <input class="form-control" id="deptId" name="deptId"
+                                   type="hidden" required
+                                   value="{{ deptId }}">
+                            <label for="registerno"></label>
+                            <label for="dayId">Hari</label>
+                            <select id="dayId" name="dayId" class="form-control" required>
+                                <option selected>Pilih Hari...</option>
+                                {% for data in hari %}
+                                    <option value="{{ data.0 }}">{{ data.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="shiftId">Shift</label>
+                            <select id="shiftId" name="shiftId" class="form-control" required>
+                                <option selected>Pilih Shift...</option>
+                                {% for data in shift %}
+                                    <option value="{{ data.pk }}">{{ data.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="timeStart">Jam Mulai</label>
+                            <input class="form-control" id="timeStart" name="timeStart"
+                                   type="time" required
+                                   placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label for="timeStop">Jam Selesai</label>
+                            <input class="form-control" id="timeStop" name="timeStop"
+                                   type="time" required
+                                   placeholder="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-dismiss="modal">
+                            Close
+                        </button>
+                        <button class="btn btn-success" type="submit"
+                                data-toggle="collapse"
+                                data-target="#collapseExample" aria-expanded="false"
+                                aria-controls="collapseExample">
+                            <i class="fa fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock container %}

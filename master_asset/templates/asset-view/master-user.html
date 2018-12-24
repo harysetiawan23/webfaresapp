@@ -1,0 +1,190 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block app_css %}
+    <link rel="stylesheet" type="text/css" href="{% static "vendors/data-tables/datatables.css" %}"/>
+
+{% endblock app_css %}
+
+{% block breadcumb %}
+    <ol class="breadcrumb">
+        {% for link,name in breadcumbs %}
+            <li class="breadcrumb-item"><a href="{{ link }}">{{ name }}</a></li>
+        {% endfor %}
+    </ol>
+{% endblock breadcumb %}
+
+
+{% block app_script %}
+    <script type="text/javascript" charset="utf8"
+            src="{% static "vendors/data-tables/datatables.min.js" %}"></script>
+    <script>
+        $("#data_master").addClass("active")
+        $(document).ready(function () {
+            $('#data_table').DataTable();
+        });
+    </script>
+{% endblock app_script %}
+
+
+{% block container %}
+    <!-- /.row-->
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-header">User</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="row">
+                                <div class="col-lg-2 col-sm-2">
+                                    <div class="callout callout-info">
+                                        <small class="text-muted">Gedung</small>
+                                        <br>
+                                        <strong class="h4">9,123</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-1" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.col-->
+                                <div class="col-lg-2 col-sm-2">
+                                    <div class="callout callout-danger">
+                                        <small class="text-muted">Ruang</small>
+                                        <br>
+                                        <strong class="h4">22,643</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-2" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- /.col-->
+                            </div>
+                            <hr class="mt-0">
+                            <div class="progress-group mb-4">
+                                <div class="progress-group-prepend">
+                                    <span class="progress-group-text">Presentase</span>
+                                </div>
+                                <div class="progress-group-bars">
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar bg-info" role="progressbar"
+                                             style="width: 34%" aria-valuenow="34" aria-valuemin="0"
+                                             aria-valuemax="100"></div>
+                                    </div>
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar bg-danger" role="progressbar"
+                                             style="width: 78%" aria-valuenow="78" aria-valuemin="0"
+                                             aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <i class="fa fa-align-justify"></i> Daftar Asset
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="data_table"
+                                                   class="table table-responsive-sm table-sm table-striped">
+                                                <thead>
+
+                                                <tr>
+                                                    <th>Username</th>
+                                                    <th>Date registered</th>
+                                                    <th>Role</th>
+                                                    <th>Status</th>
+                                                </tr>
+
+
+                                                </thead>
+                                                <tbody>
+                                                {% for gundam in data %}
+                                                    <tr>
+                                                        <td>{{ gundam.fullname }}</td>
+                                                        <td>{{ gundam.address }}</td>
+                                                        <td>Member</td>
+                                                        <td>
+                                                            <span class="badge badge-success">Active</span>
+                                                            <button class="btn btn-sm btn-primary btn-pill"
+                                                                    type="button"
+                                                                    data-toggle="collapse"
+                                                                    data-target="#{{ gundam.fullname }}"
+                                                                    aria-expanded="false"
+                                                                    aria-controls="collapseExample">
+                                                                Preview
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                <tr>
+                                                    <td>Nehemiah Tatius</td>
+                                                    <td>2012/02/01</td>
+                                                    <td>Staff</td>
+                                                    <td>
+                                                        <span class="badge badge-danger">Banned</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ebbe Gemariah</td>
+                                                    <td>2012/02/01</td>
+                                                    <td>Admin</td>
+                                                    <td>
+                                                        <span class="badge badge-secondary">Inactive</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Eustorgios Amulius</td>
+                                                    <td>2012/03/01</td>
+                                                    <td>Member</td>
+                                                    <td>
+                                                        <span class="badge badge-warning">Pending</span>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Leopold Gáspár</td>
+                                                    <td>2012/01/21</td>
+                                                    <td>Staff</td>
+                                                    <td>
+                                                        <span class="badge badge-success">Active</span>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-4">
+                                    {% for datum in data %}
+                                        <div class="collapse" id="{{ datum.pilot }}">
+                                            <div class="card card-body">Anim pariatur cliche reprehenderit, enim eiusmod
+                                                high
+                                                life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica,
+                                                craft
+                                                beer labore wes anderson cred nesciunt sapiente ea proident.
+                                            </div>
+                                        </div>
+
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+{% endblock container %}

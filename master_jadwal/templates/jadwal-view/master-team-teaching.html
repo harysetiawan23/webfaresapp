@@ -1,0 +1,320 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+
+{% block app_css %}
+    <link rel="stylesheet" type="text/css" href="{% static "vendors/data-tables/datatables.css" %}"/>
+{% endblock app_css %}
+
+
+
+{% block breadcumb %}
+    <ol class="breadcrumb">
+        {% for link,name in breadcumbs %}
+            <li class="breadcrumb-item"><a href="{{ link }}">{{ name }}</a></li>
+        {% endfor %}
+    </ol>
+{% endblock breadcumb %}
+
+
+{% block app_script %}
+    <script type="text/javascript" charset="utf8"
+            src="{% static "vendors/data-tables/datatables.min.js" %}"></script>
+    <script>
+        $("#data_master").addClass("active")
+
+        $(document).ready(function () {
+            $('#data_table').DataTable({
+                "ordering": false
+            });
+        });
+
+    </script>
+
+{% endblock app_script %}
+
+
+{% block container %}
+    <!-- /.row-->
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-header">Team Teaching</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="row">
+                                <div class="col-lg-2 col-sm-2">
+                                    <div class="callout callout-info">
+                                        <small class="text-muted">Team Teaching</small>
+                                        <br>
+                                        <strong class="h4">{{ teamCount }}</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-1" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- /.col-->
+                            </div>
+                            <hr class="mt-0">
+
+
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button" class="btn btn-success"
+                                            data-toggle="modal"
+                                            data-target="#modalTambah">
+                                        <i class="fa fa-plus"></i> Tambah Team Teaching
+                                    </button>
+
+                                </div>
+                            </div>
+                            <br/>
+                            <hr class="mt-0">
+
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <i class="fa fa-align-justify"></i> Daftar Team
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="data_table"
+                                                   class="table table-responsive-sm table-sm">
+                                                <thead>
+
+                                                <tr>
+                                                    <th>Team</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+
+
+                                                </thead>
+                                                <tbody>
+                                                {% for team in teamData %}
+                                                    <tr class="bg-secondary">
+                                                        <td>{{ team.name }} </td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-ghost-success"
+                                                                    data-toggle="modal"
+                                                                    data-target="#modalTambahTeam{{ team.pk }}">
+                                                                <i class="fa fa-plus"></i> Tambah Anggota
+                                                            </button>
+
+
+                                                            {#  Modal Tambah Anggota Team Teaching  #}
+                                                            <div class="modal fade" id="modalTambahTeam{{ team.pk }}"
+                                                                 tabindex="-1"
+                                                                 role="dialog"
+                                                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <form method="post"
+                                                                              action="{% url 'store-teacher-team' %}">
+                                                                            <div class="modal-header">
+                                                                                <h5 class="modal-title"
+                                                                                    id="exampleModalLabel">Tambah
+                                                                                    Anggota</h5>
+                                                                                <button type="button" class="close"
+                                                                                        data-dismiss="modal"
+                                                                                        aria-label="Close">
+                                                                                    <span aria-hidden="true">&times;</span>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                                                                {% csrf_token %}
+                                                                                <div class="form-group">
+                                                                                    <label for="shiftId">Pengajar</label>
+                                                                                    <input class="form-control"
+                                                                                           id="teamTeachingPk"
+                                                                                           name="teamTeachingPk"
+                                                                                           type="hidden" required
+                                                                                           value="{{ team.pk }}">
+
+                                                                                    <select id="teacherPk"
+                                                                                            name="teacherPk"
+                                                                                            class="form-control select2"
+                                                                                            required
+                                                                                        >
+                                                                                        {% for teacherData in teacherList %}
+                                                                                            <option value="{{ teacherData.pk }}">{{ teacherData.full_name }}</option>
+                                                                                        {% endfor %}
+                                                                                    </select>
+
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button"
+                                                                                        class="btn btn-secondary"
+                                                                                        data-dismiss="modal">
+                                                                                    Close
+                                                                                </button>
+                                                                                <button class="btn btn-success"
+                                                                                        type="submit"
+                                                                                        aria-expanded="false"
+                                                                                        onclick="return confirm('Data akan ditambahkan, Lanjutkan?');"
+                                                                                        aria-controls="collapseExample">
+                                                                                    <i class="fa fa-save"></i> Simpan
+                                                                                </button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <button class="btn btn-sm btn-ghost-primary"
+                                                                    data-toggle="modal"
+                                                                    data-target="#modalEditTeam{{ team.pk }}">
+                                                                <i class="fa fa-edit"></i> Edit
+                                                            </button>
+
+                                                            {#  Modal Edit Team Teaching  #}
+                                                            <div class="modal fade" id="modalEditTeam{{ team.pk }}"
+                                                                 tabindex="-1"
+                                                                 role="dialog"
+                                                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <form method="post"
+                                                                              action="{% url 'update-teaching' %}">
+                                                                            <div class="modal-header">
+                                                                                <h5 class="modal-title"
+                                                                                    id="exampleModalLabel">Registrasi
+                                                                                    Pelajar</h5>
+                                                                                <button type="button" class="close"
+                                                                                        data-dismiss="modal"
+                                                                                        aria-label="Close">
+                                                                                    <span aria-hidden="true">&times;</span>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                                                                {% csrf_token %}
+                                                                                <div class="form-group">
+                                                                                    <input class="form-control"
+                                                                                           id="teamPk" name="teamPk"
+                                                                                           type="hidden" required
+                                                                                           value="{{ team.pk }}">
+                                                                                    <label for="timeStart">Nama
+                                                                                        Team</label>
+                                                                                    <input class="form-control"
+                                                                                           id="teamName" name="teamName"
+                                                                                           type="text" required
+                                                                                           value="{{ team.name }}">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button"
+                                                                                        class="btn btn-secondary"
+                                                                                        data-dismiss="modal">
+                                                                                    Close
+                                                                                </button>
+                                                                                <button class="btn btn-success"
+                                                                                        type="submit"
+                                                                                        onclick="return confirm('Data akan disimpan, Lanjutkan?');"
+                                                                                        aria-expanded="false"
+                                                                                        aria-controls="collapseExample">
+                                                                                    <i class="fa fa-save"></i> Simpan
+                                                                                </button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {#  Modal Delete #}
+                                                            <a href="{% url "drop-teaching" %}?teamPk={{ team.pk }}"
+                                                               class="btn btn-sm btn-ghost-danger"
+                                                               onclick="return confirm('Data akan dihapus, Lanjutkan?');">
+                                                                <i class="fa fa-trash"></i> Hapus
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+
+                                                    {% for teamDt in teamDetail %}
+                                                        {% ifequal team.pk teamDt.teamId.pk %}
+                                                            <tr>
+                                                                <td>- {{ teamDt.faresUserId.full_name }}</td>
+                                                                <td>
+                                                                    {#  Modal Delete #}
+                                                                    <a href="{% url "drop-teacher-team" %}?teacherTeachingPk={{ teamDt.pk }}"
+                                                                       class="btn btn-sm btn-ghost-danger"
+                                                                       onclick="return confirm('Data akan dihapus, Lanjutkan?');">
+                                                                        <i class="fa fa-trash"></i> Hapus
+                                                                    </a>
+
+                                                                </td>
+
+                                                            </tr>
+                                                        {% endifequal %}
+                                                    {% endfor %}
+                                                {% endfor %}
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {#  Modal Tambah Team Teaching  #}
+    <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="post" action="{% url 'store-teaching' %}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Registrasi Pelajar</h5>
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input class="form-control" id="deptId" name="deptId"
+                                   type="hidden" required
+                                   value="{{ deptId }}">
+                            <label for="timeStart">Nama Team</label>
+                            <input class="form-control" id="teamName" name="teamName"
+                                   type="text" required
+                                   placeholder="">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-dismiss="modal">
+                            Close
+                        </button>
+                        <button class="btn btn-success" type="submit"
+                                data-toggle="collapse"
+                                onclick="return confirm('Data akan ditambahkan, Lanjutkan?');"
+                                data-target="#collapseExample" aria-expanded="false"
+                                aria-controls="collapseExample">
+                            <i class="fa fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock container %}

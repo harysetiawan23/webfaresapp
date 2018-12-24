@@ -1,0 +1,433 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+
+{% block app_css %}
+    <link rel="stylesheet" type="text/css" href="{% static "vendors/data-tables/datatables.css" %}"/>
+{% endblock app_css %}
+
+{% block breadcumb %}
+    <ol class="breadcrumb">
+        {% for link,name in breadcumbs %}
+            <li class="breadcrumb-item"><a href="{{ link }}">{{ name }}</a></li>
+        {% endfor %}
+    </ol>
+{% endblock breadcumb %}
+
+
+{% block app_script %}
+    <script type="text/javascript" charset="utf8"
+            src="{% static "vendors/data-tables/datatables.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "js/bootstrap-confirm-delete.js" %}"></script>
+    <script>
+        $("#data_master").addClass("active");
+        $(document).ready(function () {
+            $('#data_table').DataTable();
+            $('#tambahPelajar').click(function () {
+                $('#tambahPelajarForm').toggle();
+            });
+            $('#deleteForm').submit(function () {
+                var action = $(this).attr('action');
+                var that = $(this);
+                $.ajax({
+                    url: action,
+                    type: 'POST',
+                    data: that.serialize()
+                    , success: function (data) {
+                        console.log('Success!');
+                    }
+                });
+                return false;
+            });
+
+        });
+
+
+    </script>
+
+{% endblock app_script %}
+
+
+{% block container %}
+    <!-- /.row-->
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-header">Pelajar</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="row">
+                                <div class="col-lg-2 col-sm-2">
+                                    <div class="callout callout-success">
+                                        <small class="text-muted">Total Pelajar</small>
+                                        <br>
+                                        <strong class="h4">{{ totalCount }}</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-1" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-sm-2">
+                                    <div class="callout callout-info">
+                                        <small class="text-muted">Laki laki</small>
+                                        <br>
+                                        <strong class="h4">{{ maleCount }}</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-1" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.col-->
+                                <div class="col-lg-2 col-sm-2">
+                                    <div class="callout callout-danger">
+                                        <small class="text-muted">Perempuan</small>
+                                        <br>
+                                        <strong class="h4">{{ femaleCount }}</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-2" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- /.col-->
+                            </div>
+                            <hr class="mt-0">
+
+                            <div class="progress-group mb-4">
+                                <div class="progress-group-prepend">
+                                    <span class="progress-group-text">Presentase</span>
+                                </div>
+                                <div class="progress-group-bars">
+
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar bg-info" role="progressbar"
+                                             style="width: {{ percentMale }}%" aria-valuenow="34" aria-valuemin="0"
+                                             aria-valuemax="100"></div>
+                                    </div>
+                                    <div class="progress progress-xs">
+                                        <div class="progress-bar bg-danger" role="progressbar"
+                                             style="width: {{ percentFemale }}%" aria-valuenow="78" aria-valuemin="0"
+                                             aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#modalTambah">
+                                        <i class="fa fa-plus"></i> Tambah Pelajar
+                                    </button>
+
+                                </div>
+                            </div>
+                            <br/>
+                            <hr class="mt-0">
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <i class="fa fa-align-justify"></i> Daftar Pelajar
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="data_table"
+                                                   class="table table-responsive-sm table-sm table-striped">
+                                                <thead>
+
+                                                <tr>
+                                                    <th>NIM</th>
+                                                    <th>Nama Lengkap</th>
+                                                    <th>Alamat</th>
+                                                    <th>Angkatan</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+
+
+                                                </thead>
+                                                <tbody>
+                                                {% for datum in data %}
+                                                    <tr>
+                                                        <td>{{ datum.registred_no }}</td>
+                                                        <td>{{ datum.full_name }}</td>
+                                                        <td>{{ datum.address }}</td>
+                                                        <td>{{ datum.year }}</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-ghost-success"
+                                                                    data-toggle="modal"
+                                                                    data-target="#modalEdit{{ datum.pk }}">
+                                                                <i class="fa fa-edit"></i> Edit
+                                                            </button>
+
+                                                            {#modal edit#}
+                                                            <div class="modal fade" id="modalEdit{{ datum.pk }}"
+                                                                 tabindex="-1"
+                                                                 role="dialog"
+                                                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <form method="post"
+                                                                              action="{% url 'update_user' %}">
+                                                                            {% csrf_token %}
+                                                                            <input id="userPk" name="userPk"
+                                                                                   value="{{ datum.pk }}"
+                                                                                   type="hidden"/>
+                                                                            <div class="modal-header">
+                                                                                <h5 class="modal-title"
+                                                                                    id="exampleModalLabel">
+                                                                                    Edit Data Pelajar</h5>
+                                                                                <button type="button" class="close"
+                                                                                        data-dismiss="modal"
+                                                                                        aria-label="Close">
+                                                                                    <span aria-hidden="true">&times;</span>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                                                                {% csrf_token %}
+                                                                                <div class="form-group">
+                                                                                    <input class="form-control"
+                                                                                           id="deptId" name="deptId"
+                                                                                           type="hidden" required
+                                                                                           value="{{ deptId }}">
+                                                                                    <label for="registerno">Reg.
+                                                                                        ID</label>
+                                                                                    <input class="form-control"
+                                                                                           id="registerno"
+                                                                                           name="registerno"
+                                                                                           type="text" required
+                                                                                           placeholder="UID"
+                                                                                           value="{{ datum.registred_no }}">
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="fullname">Nama
+                                                                                        Lengkap</label>
+                                                                                    <input class="form-control"
+                                                                                           id="fullname" name="fullname"
+                                                                                           type="text"
+                                                                                           value="{{ datum.full_name }}">
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="fullname">Nama
+                                                                                        Panggilan</label>
+                                                                                    <input class="form-control"
+                                                                                           id="nickname" name="nickname"
+                                                                                           type="text"
+                                                                                           value="{{ datum.nick_name }}">
+                                                                                </div>
+                                                                                <div class="form-group">
+                                                                                    <label for="fullname">
+                                                                                        Tanggal Lahir</label>
+                                                                                    <input class="form-control date"
+                                                                                           id="dateofbirth"
+                                                                                           name="dateofbirth"
+                                                                                           type="date"
+                                                                                           value="{{ datum.date_of_birth|date:"Y-m-d" }}">
+                                                                                </div>
+                                                                                <fieldset class="form-group">
+                                                                                    <div class="row">
+                                                                                        <legend class="col-form-label col-sm-2 pt-0">
+                                                                                            Jenis Kelamin
+                                                                                        </legend>
+
+                                                                                        {% ifequal datum.gender 1 %}
+                                                                                            <div class="col-sm-10">
+                                                                                                <div class="form-check">
+                                                                                                    <input class="form-check-input"
+                                                                                                           type="radio"
+                                                                                                           name="gender"
+                                                                                                           id="genderMale"
+                                                                                                           value="1"
+                                                                                                           checked>
+                                                                                                    <label class="form-check-label"
+                                                                                                           for="genderMale">
+                                                                                                        Laki - Laki
+                                                                                                    </label>
+                                                                                                </div>
+                                                                                                <div class="form-check">
+                                                                                                    <input class="form-check-input"
+                                                                                                           type="radio"
+                                                                                                           name="gender"
+                                                                                                           id="genderFemale"
+                                                                                                           value="2">
+                                                                                                    <label class="form-check-label"
+                                                                                                           for="genderFemale">
+                                                                                                        Perempuan
+                                                                                                    </label>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        {% endifequal %}
+                                                                                        {% ifequal datum.gender 2 %}
+                                                                                            <div class="col-sm-10">
+                                                                                                <div class="form-check">
+                                                                                                    <input class="form-check-input"
+                                                                                                           type="radio"
+                                                                                                           name="gender"
+                                                                                                           id="genderMale"
+                                                                                                           value="1">
+                                                                                                    <label class="form-check-label"
+                                                                                                           for="genderMale">
+                                                                                                        Laki - Laki
+                                                                                                    </label>
+                                                                                                </div>
+                                                                                                <div class="form-check">
+                                                                                                    <input class="form-check-input"
+                                                                                                           type="radio"
+                                                                                                           name="gender"
+                                                                                                           id="genderFemale"
+                                                                                                           value="2"
+                                                                                                           checked>
+                                                                                                    <label class="form-check-label"
+                                                                                                           for="genderFemale"
+                                                                                                    >
+                                                                                                        Perempuan
+                                                                                                    </label>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        {% endifequal %}
+
+
+                                                                                    </div>
+                                                                                </fieldset>
+                                                                                <div class="form-group">
+                                                                                    <label for="alamat">
+                                                                                        Alamat</label>
+                                                                                    <textarea
+                                                                                            name="address"
+                                                                                            class="form-control"
+                                                                                            rows="5"
+                                                                                            id="address">{{ datum.address }}
+                                                                                            </textarea>
+                                                                                </div>
+
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button"
+                                                                                        class="btn btn-secondary"
+                                                                                        data-dismiss="modal">
+                                                                                    Close
+                                                                                </button>
+                                                                                <button class="btn btn-success"
+                                                                                        type="submit"
+                                                                                        onclick="return confirm('Data akan disimpan, Lanjutkan?');"
+                                                                                        data-toggle="collapse"
+                                                                                        data-target="#collapseExample"
+                                                                                        aria-expanded="false"
+                                                                                        aria-controls="collapseExample">
+                                                                                    <i class="fa fa-save"></i> Simpan
+                                                                                </button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+
+                                                            {#  Modal Delete #}
+                                                            <a href="{% url 'delete_user' %}?userPk={{ datum.pk }}"
+                                                               class="btn btn-sm btn-ghost-danger"
+                                                               onclick="return confirm('Data akan dihapus, Lanjutkan?');">
+                                                                <i class="fa fa-trash"></i> Hapus
+                                                            </a>
+
+
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
+
+    {#  Modal Tambah Pelajar  #}
+    <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="post" action="{% url 'register_user' %}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Registrasi Pelajar</h5>
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input class="form-control" id="deptId" name="deptId"
+                                   type="hidden" required
+                                   value="{{ deptId }}">
+                            <label for="registerno">Reg. ID</label>
+                            <input class="form-control" id="registerno" name="registerno"
+                                   type="text" required
+                                   placeholder="">
+                        </div>
+                        <div class="form-group">
+                            <label for="fullname">Nama Lengkap</label>
+                            <input class="form-control" id="fullname" name="fullname"
+                                   type="text"
+                                   placeholder="">
+                        </div>
+                        <fieldset class="form-group">
+                            <div class="row">
+                                <legend class="col-form-label col-sm-2 pt-0">Jenis Kelamin
+                                </legend>
+                                <div class="col-sm-10">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               name="gender" id="genderMale"
+                                               value="1" checked>
+                                        <label class="form-check-label" for="genderMale">
+                                            Laki - Laki
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio"
+                                               name="gender" id="genderFemale"
+                                               value="2">
+                                        <label class="form-check-label" for="genderFemale">
+                                            Perempuan
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-dismiss="modal">
+                            Close
+                        </button>
+                        <button class="btn btn-success" type="submit"
+                                data-toggle="collapse"
+                                onclick="return confirm('Data akan ditambahkan, Lanjutkan?');"
+                                data-target="#collapseExample" aria-expanded="false"
+                                aria-controls="collapseExample">
+                            <i class="fa fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock container %}

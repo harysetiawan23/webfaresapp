@@ -1,0 +1,235 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+{% block app_css %}
+    <link rel="stylesheet" type="text/css" href="{% static "vendors/data-tables/datatables.css" %}"/>
+
+{% endblock app_css %}
+
+
+{% block breadcumb %}
+    <ol class="breadcrumb">
+        {% for link,name in breadcumbs %}
+            <li class="breadcrumb-item"><a href="{{ link }}">{{ name }}</a></li>
+        {% endfor %}
+    </ol>
+{% endblock breadcumb %}
+
+
+{% block app_script %}
+    <script type="text/javascript" charset="utf8"
+            src="{% static "vendors/data-tables/datatables.min.js" %}"></script>
+    <script>
+        $("#data_master").addClass("active")
+        $(document).ready(function () {
+            $('#data_table').DataTable();
+        });
+    </script>
+{% endblock app_script %}
+
+
+{% block container %}
+    <!-- /.row-->
+    <div class="row">
+        <div class="col-lg-12">
+
+
+            <div class="card">
+                <div class="card-header">Ruang</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="row">
+                                <div class="col-lg-2 col-sm-2">
+                                    <div class="callout callout-success">
+                                        <small class="text-muted">Ruang</small>
+                                        <br>
+                                        <strong class="h4">{{ totalRuang }}</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-1" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- /.col-->
+
+                            </div>
+                            <hr class="mt-0">
+
+
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#modalTambah">
+                                        <i class="fa fa-plus"></i> Tambah Ruang
+                                    </button>
+
+                                </div>
+                            </div>
+                            <br/>
+
+                            <hr class="mt-0">
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <i class="fa fa-align-justify"></i> Daftar Ruang
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="data_table"
+                                                   class="table table-responsive-sm table-sm table-striped">
+                                                <thead>
+
+                                                <tr>
+                                                    <th>Ruang</th>
+                                                    <th>Unit</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+
+
+                                                </thead>
+                                                <tbody>
+                                                {% for datum in dataRuang %}
+                                                    <tr>
+                                                        <td>{{ datum.class_name }}</td>
+                                                        <td>{{ datum.departement.name }}</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-ghost-success"
+                                                                    data-toggle="modal"
+                                                                    data-target="#modalUbah{{ datum.pk }}">
+                                                                <i class="fa fa-edit"></i> Edit
+                                                            </button>
+
+
+                                                            {#  Modal Ubah Pelajaran  #}
+                                                            <div class="modal fade" id="modalUbah{{ datum.pk }}"
+                                                                 tabindex="-1"
+                                                                 role="dialog"
+                                                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                                <div class="modal-dialog" role="document">
+                                                                    <div class="modal-content">
+                                                                        <form method="post"
+                                                                              action="{% url 'update-ruang' %}">
+                                                                            <div class="modal-header">
+                                                                                <h5 class="modal-title"
+                                                                                    id="exampleModalLabel">Ubah
+                                                                                    Pelajaran</h5>
+                                                                                <button type="button" class="close"
+                                                                                        data-dismiss="modal"
+                                                                                        aria-label="Close">
+                                                                                    <span aria-hidden="true">&times;</span>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class="modal-body">
+                                                                                {% csrf_token %}
+                                                                                <div class="form-group">
+                                                                                    <input class="form-control"
+                                                                                           id="classPk"
+                                                                                           name="classPk"
+                                                                                           type="hidden" required
+                                                                                           value="{{ datum.pk }}">
+                                                                                    <label for="registerno">Nama
+                                                                                        Kelas</label>
+                                                                                    <input class="form-control"
+                                                                                           id="classname"
+                                                                                           name="classname"
+                                                                                           type="text" required
+                                                                                           value="{{ datum.class_name }}">
+                                                                                </div>
+
+                                                                            </div>
+                                                                            <div class="modal-footer">
+                                                                                <button type="button"
+                                                                                        class="btn btn-secondary"
+                                                                                        data-dismiss="modal">
+                                                                                    Close
+                                                                                </button>
+                                                                                <button class="btn btn-success"
+                                                                                        type="submit"
+                                                                                        data-toggle="collapse"
+                                                                                        onclick="return confirm('Data akan diubah, Lanjutkan?');"
+                                                                                        data-target="#collapseExample"
+                                                                                        aria-expanded="false"
+                                                                                        aria-controls="collapseExample">
+                                                                                    <i class="fa fa-save"></i> Simpan
+                                                                                </button>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {#  Modal Delete #}
+                                                            <a href="{% url 'drop-ruang' %}?classPk={{ datum.pk }}"
+                                                               class="btn btn-sm btn-ghost-danger"
+                                                               onclick="return confirm('Data akan dihapus, Lanjutkan?');">
+                                                                <i class="fa fa-trash"></i> Hapus
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    {#  Modal Tambah Ruang  #}
+    <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="post" action="{% url 'store-ruang' %}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Tambah Ruang Belajar</h5>
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <input class="form-control" id="deptId" name="deptId"
+                                   type="hidden" required
+                                   value="{{ deptId }}">
+                            <label for="classname">Nama Kelas</label>
+                            <input class="form-control" id="classname" name="classname"
+                                   type="text" required
+                                   placeholder="">
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary"
+                                    data-dismiss="modal">
+                                Close
+                            </button>
+                            <button class="btn btn-success" type="submit"
+                                    data-toggle="collapse"
+                                    data-target="#collapseExample" aria-expanded="false"
+                                    aria-controls="collapseExample">
+                                <i class="fa fa-save"></i> Simpan
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock container %}

@@ -1,0 +1,133 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+
+{% block app_css %}
+    <link rel="stylesheet" type="text/css" href="{% static "vendors/data-tables/datatables.css" %}"/>
+
+{% endblock app_css %}
+
+{% block breadcumb %}
+    <ol class="breadcrumb">
+        {% for link,name in breadcumbs %}
+            <li class="breadcrumb-item"><a href="{{ link }}">{{ name }}</a></li>
+        {% endfor %}
+    </ol>
+{% endblock breadcumb %}
+
+
+{% block app_script %}
+    <script type="text/javascript" charset="utf8"
+            src="{% static "vendors/data-tables/datatables.min.js" %}"></script>
+    <script>
+        $("#data_master").addClass("active")
+
+        $(document).ready(function () {
+            $('#data_table').DataTable();
+        });
+
+        $('#edit').onclick(function () {
+            alert("EDITED CLICKED")
+        })
+    </script>
+
+{% endblock app_script %}
+
+
+{% block container %}
+    <!-- /.row-->
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-header">Kelas Pelajar</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="row">
+
+
+                                <!-- /.col-->
+                            </div>
+                            <hr class="mt-0">
+
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <i class="fa fa-align-justify"></i> Kelas Pelajar
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="data_table"
+                                                   class="table table-responsive-sm table-sm">
+                                                <thead>
+
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Nama</th>
+                                                    <th>Kelas</th>
+                                                    <th>Mulai</th>
+                                                    <th>Selesai</th>
+                                                    <th>Pelajaran</th>
+                                                    <th>Team</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+
+
+                                                </thead>
+                                                <tbody>
+                                                {% for datum in data %}
+                                                    <tr>
+                                                        <td>{{ datum.id }}</td>
+                                                        <td>{{ datum.studentId.full_name }}</td>
+                                                        <td>{{ datum.subjectOfferId.classRoomId.class_name }}</td>
+                                                        <td>{{ datum.subjectOfferId.time_id.hour_start }}</td>
+                                                        <td>{{ datum.subjectOfferId.time_id.hour_stop }}</td>
+                                                        <td>{{ datum.subjectOfferId.subject_id.name }}</td>
+                                                        <td>{{ datum.subjectOfferId.teamTeaching_id.name }}</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-ghost-success"><i
+                                                                    class="fa fa-edit"></i> Edit
+                                                            </button>
+                                                            <button class="btn btn-sm btn-ghost-danger"><i
+                                                                    class="fa fa-trash"></i> Hapus
+                                                            </button>
+                                                        </td>
+
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-4">
+                                    {% for datum in data %}
+                                        <div class="collapse" id="{{ datum.pilot }}">
+                                            <div class="card card-body">Anim pariatur cliche reprehenderit, enim eiusmod
+                                                high
+                                                life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica,
+                                                craft
+                                                beer labore wes anderson cred nesciunt sapiente ea proident.
+                                            </div>
+                                        </div>
+
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+{% endblock container %}
