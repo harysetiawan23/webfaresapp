@@ -3,8 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from master_user.models import FaresUser
 from django.urls import reverse
 from django.http import HttpResponseRedirect, HttpResponse
-import json
-from django.core import serializers
+import psutil
 
 
 # Create your views here.
@@ -33,8 +32,8 @@ def login_user(request):
 def register_user(request):
     print('Registered')
     if request.POST:
-        user = FaresUser.objects.create_user(request.POST['registerno'], False, request.POST['registerno'])
-        user.registred_no = request.POST['registerno']
+        user = FaresUser.objects.create_user(request.POST['registred_no'], False, request.POST['registred_no'])
+        user.registred_no = request.POST['registred_no']
         user.dept_id_id = request.POST['deptId']
         user.full_name = request.POST['fullname']
         user.gender = request.POST['gender']
@@ -56,6 +55,7 @@ def upadate_user(request):
     print('Delete Check')
     if request.POST:
         user = FaresUser.objects.get(pk=str(request.POST['userPk']))
+        user.registred_no = request.POST['registred_no']
         user.full_name = request.POST['fullname']
         user.nick_name = request.POST['nickname']
         user.date_of_birth = request.POST['dateofbirth']

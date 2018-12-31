@@ -3,12 +3,13 @@ from django.contrib import admin
 
 from master_asset.models import student,departement
 from master_jadwal.models import subject_offer
+from master_user.models import FaresUser
 
 class studentClass(models.Model):
 
     studentId = models.ForeignKey(
-        student,
-        on_delete=models.CASCADE
+        FaresUser,
+        on_delete=models.CASCADE,
     )
     subjectOfferId = models.ForeignKey(
         subject_offer,

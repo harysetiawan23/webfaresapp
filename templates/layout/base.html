@@ -80,9 +80,59 @@
 
 
         <div class="container-fluid">
-            {% block container %}
+            <div class="row">
+                <div class="col-lg-10 col-md-10">
+                    {% block container %}
 
-            {% endblock container %}
+                    {% endblock container %}
+                </div>
+                <div class="col-lg-2 col-md-2">
+                    <div class="text-uppercase mb-1">
+                        <small>
+                            <b>System Utilization</b>
+                        </small>
+                    </div>
+                    <div class="text-uppercase mb-1">
+                        <small>
+                            <b>CPU Usage</b>
+                        </small>
+                    </div>
+                    <div class="progress progress-xs">
+                        <div id="cpu_process" class="progress-bar bg-info" role="progressbar"
+                             style="width: {{ cpu }}%"
+                             aria-valuenow="25"
+                             aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <small class="text-muted" id="cpuload">{{ cpu }} % Load</small>
+
+
+                    <div class="text-uppercase mb-1">
+                        <small>
+                            <b>Memory Usage</b>
+                        </small>
+                    </div>
+                    <div class="progress progress-xs">
+                        <div id="mem_process" class="progress-bar bg-warning" role="progressbar"
+                             style="width: {{ mem.percent }}%"
+                             aria-valuenow="70"
+                             aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <small class="text-muted" id="memload">Free {{ mem.av }} GB / {{ mem.tot }} GB</small>
+                    <div class="text-uppercase mb-1">
+                        <small>
+                            <b>Storage</b>
+                        </small>
+                    </div>
+                    <div class="progress progress-xs">
+                        <div id="storage_percent" class="progress-bar bg-danger" role="progressbar"
+                             style="width: {{ disk.percent }}%"
+                             aria-valuenow="95"
+                             aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <small class="text-muted" id="storageload">Used {{ disk.used }} / {{ disk.tot }} GB</small>
+
+                </div>
+            </div>
         </div>
     </main>
     <aside class="aside-menu">
@@ -404,7 +454,7 @@
         </div>
     </aside>
 </div>
-<footer class="app-footer">
+<footer id="systemStat" class="app-footer">
     <div>
         <a href="https://coreui.io">CoreUI</a>
         <span>&copy; 2018 creativeLabs.</span>
@@ -413,6 +463,8 @@
         <span>Powered by</span>
         <a href="https://coreui.io">CoreUI</a>
     </div>
+
+
 </footer>
 
 
@@ -424,7 +476,29 @@
 <script src="{% static "vendors/perfect-scrollbar/js/perfect-scrollbar.min.js" %}"></script>
 <script src="{% static "vendors/@coreui/coreui/js/coreui.min.js" %}"></script>
 
+<script type="text/javascript">
+    setInterval(function update_coins() {
+        $.ajax({
+            method: "GET",
+            url: "{% url 'sysstat' %}",
+            data: {},
+            success: function (data) {
+                console.log(data);
 
+                $("#storage_percent").css('width', data.disk.percent + '%');
+                $("#storageload").html('Used ' + data.disk.used + ' GB / ' + data.disk.tot + 'GB');
+
+                $("#cpu_process").css('width', data.cpu + '%');
+                $("#cpuload").html(data.cpu + '% Load');
+
+                $("#mem_process").css('width', data.mem.percent + '%');
+                $("#memload").html("Free " + data.mem.av + ' GB / ' + data.mem.tot + 'GB');
+
+
+            }
+        })
+    }, 1000)
+</script>
 
 {% block app_script %}
 

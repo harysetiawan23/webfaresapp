@@ -23,8 +23,14 @@
         $("#data_master").addClass("active")
 
         $(document).ready(function () {
-            $('#data_table').DataTable();
+            $('#data_table').DataTable({
+                sort: false
+            });
         });
+
+        function detail(data) {
+            location.href = "{% url 'kelas-pelajar' %}?kelas=" + data;
+        }
     </script>
 
 {% endblock app_script %}
@@ -44,9 +50,9 @@
                             <div class="row">
                                 <div class="col-lg-2 col-sm-2">
                                     <div class="callout callout-info">
-                                        <small class="text-muted">Jenis Kelas</small>
+                                        <small class="text-muted">Kelas</small>
                                         <br>
-                                        <strong class="h4">{{ shiftCount }}</strong>
+                                        <strong class="h4">{{ studentClassDataCount }}</strong>
                                         <div class="chart-wrapper">
                                             <canvas id="sparkline-chart-1" width="100" height="30"></canvas>
                                         </div>
@@ -66,53 +72,76 @@
                                             <i class="fa fa-align-justify"></i> Daftar Team
                                         </div>
                                         <div class="card-body">
-                                            <table id="data_table"
-                                                   class="table table-responsive-sm table-sm">
-                                                <thead>
+                                            <div class="card-body">
+                                                <table id="data_table"
+                                                       class="table table-responsive-sm table-sm table-hover">
+                                                    <thead>
 
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Nama Kelas</th>
-                                                    <th>Aksi</th>
-                                                </tr>
-
-
-                                                </thead>
-                                                <tbody>
-                                                {% for datum in data %}
                                                     <tr>
-                                                        <td>{{ datum.id }}</td>
-                                                        <td>
-                                                            {{ datum.name }}
-                                                        </td>
-                                                        <td>
-                                                            <button class="btn btn-sm btn-ghost-success"><i
-                                                                    class="fa fa-edit"></i> Edit
-                                                            </button>
-                                                            <button class="btn btn-sm btn-ghost-danger"><i
-                                                                    class="fa fa-trash"></i> Hapus
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                {% endfor %}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
+                                                        <th>Hari</th>
+                                                        <th>Kelas</th>
+                                                        <th>Mulai</th>
+                                                        <th>Selesai</th>
+                                                        <th>Mat Pelajaran</th>
+                                                        <th>Team</th>
 
-                                </div>
-                                <div class="col-lg-4">
-                                    {% for datum in data %}
-                                        <div class="collapse" id="{{ datum.pilot }}">
-                                            <div class="card card-body">Anim pariatur cliche reprehenderit, enim eiusmod
-                                                high
-                                                life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica,
-                                                craft
-                                                beer labore wes anderson cred nesciunt sapiente ea proident.
+                                                    </tr>
+
+
+                                                    </thead>
+                                                    <tbody>
+                                                    {% for datum in data %}
+                                                        <tr class='clickable-row' onclick="detail({{ datum.pk }})">
+                                                            <td>
+                                                                {% ifequal datum.time_id.day 0 %}
+                                                                    Minggu
+                                                                {% endifequal %}
+
+                                                                {% ifequal datum.time_id.day 1 %}
+                                                                    Senin
+                                                                {% endifequal %}
+                                                                {% ifequal datum.time_id.day 2 %}
+                                                                    Selasa
+                                                                {% endifequal %}
+                                                                {% ifequal datum.time_id.day 3 %}
+                                                                    Rabu
+                                                                {% endifequal %}
+                                                                {% ifequal datum.time_id.day 4 %}
+                                                                    Kamis
+                                                                {% endifequal %}
+                                                                {% ifequal datum.time_id.day 5 %}
+                                                                    Jumat
+                                                                {% endifequal %}
+                                                                {% ifequal datum.time_id.day 6 %}
+                                                                    Sabtu
+                                                                {% endifequal %}
+
+
+                                                            </td>
+                                                            <td>
+                                                                {{ datum.classRoomId.class_name }}
+                                                            </td>
+
+                                                            <td>
+                                                                {{ datum.time_id.hour_start }}
+                                                            </td>
+                                                            <td>
+                                                                {{ datum.time_id.hour_stop }}
+                                                            </td>
+                                                            <td>
+                                                                {{ datum.subject_id.name }}
+                                                            </td>
+                                                            <td>
+                                                                {{ datum.teamTeaching_id.name }}
+                                                            </td>
+
+                                                        </tr>
+                                                    {% endfor %}
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
-
-                                    {% endfor %}
+                                    </div>
 
                                 </div>
                             </div>

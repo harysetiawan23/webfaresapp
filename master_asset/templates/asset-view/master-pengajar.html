@@ -23,6 +23,11 @@
         $(document).ready(function () {
             $('#data_table').DataTable();
         });
+
+
+        function modalEdit(data) {
+            $('#modalEdit' + data).modal('show');
+        }
     </script>
 {% endblock app_script %}
 
@@ -39,7 +44,7 @@
                         <div class="col-lg-12">
 
                             <div class="row">
-                                <div class="col-lg-2 col-sm-2">
+                                <div class="col-lg-4 col-sm-4">
                                     <div class="callout callout-success">
                                         <small class="text-muted">Total</small>
                                         <br>
@@ -49,7 +54,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-2 col-sm-2">
+                                <div class="col-lg-4 col-sm-4">
                                     <div class="callout callout-info">
                                         <small class="text-muted">Pria</small>
                                         <br>
@@ -60,7 +65,7 @@
                                     </div>
                                 </div>
                                 <!-- /.col-->
-                                <div class="col-lg-2 col-sm-2">
+                                <div class="col-lg-4 col-sm-4">
                                     <div class="callout callout-danger">
                                         <small class="text-muted">Wanita</small>
                                         <br>
@@ -122,195 +127,187 @@
                                                 <tr>
                                                     <th>NIP</th>
                                                     <th>Nama</th>
-                                                    <th>Jurusan</th>
-                                                    <th>Aksi</th>
+                                                    <th>Alamat</th>
                                                 </tr>
 
 
                                                 </thead>
                                                 <tbody>
                                                 {% for datum in data %}
-                                                    <tr>
+                                                    <tr onclick="modalEdit({{ datum.pk }})">
                                                         <td>{{ datum.registred_no }}</td>
                                                         <td>{{ datum.full_name }}</td>
-                                                        <td>{{ datum.dept_id }}</td>
-                                                        <td>
-                                                            <button class="btn btn-sm btn-ghost-success"
-                                                                    data-toggle="modal"
-                                                                    data-target="#modalEdit{{ datum.pk }}">
-                                                                <i class="fa fa-edit"></i> Edit
-                                                            </button>
+                                                        <td>{{ datum.address }}</td>
 
-                                                            {#modal edit#}
-                                                            <div class="modal fade" id="modalEdit{{ datum.pk }}"
-                                                                 tabindex="-1"
-                                                                 role="dialog"
-                                                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                                <div class="modal-dialog" role="document">
-                                                                    <div class="modal-content">
-                                                                        <form method="post"
-                                                                              action="{% url 'update-pengajar' %}">
+                                                        {#modal edit#}
+                                                        <div class="modal fade" id="modalEdit{{ datum.pk }}"
+                                                             tabindex="-1"
+                                                             role="dialog"
+                                                             aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <form method="post"
+                                                                          action="{% url 'update-pengajar' %}">
+                                                                        {% csrf_token %}
+                                                                        <input id="userPk" name="userPk"
+                                                                               value="{{ datum.pk }}"
+                                                                               type="hidden"/>
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title"
+                                                                                id="exampleModalLabel">
+                                                                                Edit Data Pelajar</h5>
+                                                                            <button type="button" class="close"
+                                                                                    data-dismiss="modal"
+                                                                                    aria-label="Close">
+                                                                                <span aria-hidden="true">&times;</span>
+                                                                            </button>
+                                                                        </div>
+                                                                        <div class="modal-body">
                                                                             {% csrf_token %}
-                                                                            <input id="userPk" name="userPk"
-                                                                                   value="{{ datum.pk }}"
-                                                                                   type="hidden"/>
-                                                                            <div class="modal-header">
-                                                                                <h5 class="modal-title"
-                                                                                    id="exampleModalLabel">
-                                                                                    Edit Data Pelajar</h5>
-                                                                                <button type="button" class="close"
-                                                                                        data-dismiss="modal"
-                                                                                        aria-label="Close">
-                                                                                    <span aria-hidden="true">&times;</span>
-                                                                                </button>
+                                                                            <div class="form-group">
+                                                                                <input class="form-control"
+                                                                                       id="deptId" name="deptId"
+                                                                                       type="hidden" required
+                                                                                       value="{{ deptId }}">
+                                                                                <label for="registerno">Reg.
+                                                                                    ID</label>
+                                                                                <input class="form-control"
+                                                                                       id="registerno"
+                                                                                       name="registerno"
+                                                                                       type="text" required
+                                                                                       placeholder="UID"
+                                                                                       value="{{ datum.registred_no }}">
                                                                             </div>
-                                                                            <div class="modal-body">
-                                                                                {% csrf_token %}
-                                                                                <div class="form-group">
-                                                                                    <input class="form-control"
-                                                                                           id="deptId" name="deptId"
-                                                                                           type="hidden" required
-                                                                                           value="{{ deptId }}">
-                                                                                    <label for="registerno">Reg.
-                                                                                        ID</label>
-                                                                                    <input class="form-control"
-                                                                                           id="registerno"
-                                                                                           name="registerno"
-                                                                                           type="text" required
-                                                                                           placeholder="UID"
-                                                                                           value="{{ datum.registred_no }}">
-                                                                                </div>
-                                                                                <div class="form-group">
-                                                                                    <label for="fullname">Nama
-                                                                                        Lengkap</label>
-                                                                                    <input class="form-control"
-                                                                                           id="fullname" name="fullname"
-                                                                                           type="text"
-                                                                                           value="{{ datum.full_name }}">
-                                                                                </div>
-                                                                                <div class="form-group">
-                                                                                    <label for="fullname">Nama
-                                                                                        Panggilan</label>
-                                                                                    <input class="form-control"
-                                                                                           id="nickname" name="nickname"
-                                                                                           type="text"
-                                                                                           value="{{ datum.nick_name }}">
-                                                                                </div>
-                                                                                <div class="form-group">
-                                                                                    <label for="fullname">
-                                                                                        Tanggal Lahir</label>
-                                                                                    <input class="form-control date"
-                                                                                           id="dateofbirth"
-                                                                                           name="dateofbirth"
-                                                                                           type="date"
-                                                                                           value="{{ datum.date_of_birth|date:"Y-m-d" }}">
-                                                                                </div>
-                                                                                <fieldset class="form-group">
-                                                                                    <div class="row">
-                                                                                        <legend class="col-form-label col-sm-2 pt-0">
-                                                                                            Jenis Kelamin
-                                                                                        </legend>
+                                                                            <div class="form-group">
+                                                                                <label for="fullname">Nama
+                                                                                    Lengkap</label>
+                                                                                <input class="form-control"
+                                                                                       id="fullname" name="fullname"
+                                                                                       type="text"
+                                                                                       value="{{ datum.full_name }}">
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label for="fullname">Nama
+                                                                                    Panggilan</label>
+                                                                                <input class="form-control"
+                                                                                       id="nickname" name="nickname"
+                                                                                       type="text"
+                                                                                       value="{{ datum.nick_name }}">
+                                                                            </div>
+                                                                            <div class="form-group">
+                                                                                <label for="fullname">
+                                                                                    Tanggal Lahir</label>
+                                                                                <input class="form-control date"
+                                                                                       id="dateofbirth"
+                                                                                       name="dateofbirth"
+                                                                                       type="date"
+                                                                                       value="{{ datum.date_of_birth|date:"Y-m-d" }}">
+                                                                            </div>
+                                                                            <fieldset class="form-group">
+                                                                                <div class="row">
+                                                                                    <legend class="col-form-label col-sm-2 pt-0">
+                                                                                        Jenis Kelamin
+                                                                                    </legend>
 
-                                                                                        {% ifequal datum.gender 1 %}
-                                                                                            <div class="col-sm-10">
-                                                                                                <div class="form-check">
-                                                                                                    <input class="form-check-input"
-                                                                                                           type="radio"
-                                                                                                           name="gender"
-                                                                                                           id="genderMale"
-                                                                                                           value="1"
-                                                                                                           checked>
-                                                                                                    <label class="form-check-label"
-                                                                                                           for="genderMale">
-                                                                                                        Laki - Laki
-                                                                                                    </label>
-                                                                                                </div>
-                                                                                                <div class="form-check">
-                                                                                                    <input class="form-check-input"
-                                                                                                           type="radio"
-                                                                                                           name="gender"
-                                                                                                           id="genderFemale"
-                                                                                                           value="2">
-                                                                                                    <label class="form-check-label"
-                                                                                                           for="genderFemale">
-                                                                                                        Perempuan
-                                                                                                    </label>
-                                                                                                </div>
+                                                                                    {% ifequal datum.gender 1 %}
+                                                                                        <div class="col-sm-10">
+                                                                                            <div class="form-check">
+                                                                                                <input class="form-check-input"
+                                                                                                       type="radio"
+                                                                                                       name="gender"
+                                                                                                       id="genderMale"
+                                                                                                       value="1"
+                                                                                                       checked>
+                                                                                                <label class="form-check-label"
+                                                                                                       for="genderMale">
+                                                                                                    Laki - Laki
+                                                                                                </label>
                                                                                             </div>
-                                                                                        {% endifequal %}
-                                                                                        {% ifequal datum.gender 2 %}
-                                                                                            <div class="col-sm-10">
-                                                                                                <div class="form-check">
-                                                                                                    <input class="form-check-input"
-                                                                                                           type="radio"
-                                                                                                           name="gender"
-                                                                                                           id="genderMale"
-                                                                                                           value="1">
-                                                                                                    <label class="form-check-label"
-                                                                                                           for="genderMale">
-                                                                                                        Laki - Laki
-                                                                                                    </label>
-                                                                                                </div>
-                                                                                                <div class="form-check">
-                                                                                                    <input class="form-check-input"
-                                                                                                           type="radio"
-                                                                                                           name="gender"
-                                                                                                           id="genderFemale"
-                                                                                                           value="2"
-                                                                                                           checked>
-                                                                                                    <label class="form-check-label"
-                                                                                                           for="genderFemale"
-                                                                                                    >
-                                                                                                        Perempuan
-                                                                                                    </label>
-                                                                                                </div>
+                                                                                            <div class="form-check">
+                                                                                                <input class="form-check-input"
+                                                                                                       type="radio"
+                                                                                                       name="gender"
+                                                                                                       id="genderFemale"
+                                                                                                       value="2">
+                                                                                                <label class="form-check-label"
+                                                                                                       for="genderFemale">
+                                                                                                    Perempuan
+                                                                                                </label>
                                                                                             </div>
-                                                                                        {% endifequal %}
+                                                                                        </div>
+                                                                                    {% endifequal %}
+                                                                                    {% ifequal datum.gender 2 %}
+                                                                                        <div class="col-sm-10">
+                                                                                            <div class="form-check">
+                                                                                                <input class="form-check-input"
+                                                                                                       type="radio"
+                                                                                                       name="gender"
+                                                                                                       id="genderMale"
+                                                                                                       value="1">
+                                                                                                <label class="form-check-label"
+                                                                                                       for="genderMale">
+                                                                                                    Laki - Laki
+                                                                                                </label>
+                                                                                            </div>
+                                                                                            <div class="form-check">
+                                                                                                <input class="form-check-input"
+                                                                                                       type="radio"
+                                                                                                       name="gender"
+                                                                                                       id="genderFemale"
+                                                                                                       value="2"
+                                                                                                       checked>
+                                                                                                <label class="form-check-label"
+                                                                                                       for="genderFemale"
+                                                                                                >
+                                                                                                    Perempuan
+                                                                                                </label>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    {% endifequal %}
 
 
-                                                                                    </div>
-                                                                                </fieldset>
-                                                                                <div class="form-group">
-                                                                                    <label for="alamat">
-                                                                                        Alamat</label>
-                                                                                    <textarea
-                                                                                            name="address"
-                                                                                            class="form-control"
-                                                                                            rows="5"
-                                                                                            id="address">{{ datum.address }}
+                                                                                </div>
+                                                                            </fieldset>
+                                                                            <div class="form-group">
+                                                                                <label for="alamat">
+                                                                                    Alamat</label>
+                                                                                <textarea
+                                                                                        name="address"
+                                                                                        class="form-control"
+                                                                                        rows="5"
+                                                                                        id="address">{{ datum.address }}
                                                                                             </textarea>
-                                                                                </div>
+                                                                            </div>
 
-                                                                            </div>
-                                                                            <div class="modal-footer">
-                                                                                <button type="button"
-                                                                                        class="btn btn-secondary"
-                                                                                        data-dismiss="modal">
-                                                                                    Close
-                                                                                </button>
-                                                                                <button class="btn btn-success"
-                                                                                        type="submit"
-                                                                                        onclick="return confirm('Data akan disimpan, Lanjutkan?');"
-                                                                                        data-toggle="collapse"
-                                                                                        data-target="#collapseExample"
-                                                                                        aria-expanded="false"
-                                                                                        aria-controls="collapseExample">
-                                                                                    <i class="fa fa-save"></i> Simpan
-                                                                                </button>
-                                                                            </div>
-                                                                        </form>
-                                                                    </div>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button"
+                                                                                    class="btn btn-secondary"
+                                                                                    data-dismiss="modal">
+                                                                                Close
+                                                                            </button>
+
+                                                                            {#  Modal Delete #}
+                                                                            <a href="{% url 'drop-pengajar' %}?userPk={{ datum.pk }}"
+                                                                               class="btn btn-danger"
+                                                                               onclick="return confirm('Data akan dihapus, Lanjutkan?');">
+                                                                                <i class="fa fa-trash"></i> Hapus
+                                                                            </a>
+                                                                            <button class="btn btn-success"
+                                                                                    type="submit"
+                                                                                    onclick="return confirm('Data akan disimpan, Lanjutkan?');"
+                                                                                    data-toggle="collapse"
+                                                                                    data-target="#collapseExample"
+                                                                                    aria-expanded="false"
+                                                                                    aria-controls="collapseExample">
+                                                                                <i class="fa fa-save"></i> Simpan
+                                                                            </button>
+                                                                        </div>
+                                                                    </form>
                                                                 </div>
                                                             </div>
+                                                        </div>
 
-                                                            {#  Modal Delete #}
-                                                            <a href="{% url 'drop-pengajar' %}?userPk={{ datum.pk }}"
-                                                               class="btn btn-sm btn-ghost-danger"
-                                                               onclick="return confirm('Data akan dihapus, Lanjutkan?');">
-                                                                <i class="fa fa-trash"></i> Hapus
-                                                            </a>
-
-                                                        </td>
                                                     </tr>
                                                 {% endfor %}
                                                 </tbody>

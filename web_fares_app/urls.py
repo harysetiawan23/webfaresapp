@@ -16,4 +16,7 @@ urlpatterns = [
     # url(r'^login', views.login),
     # url(r'^test',views.simpleData),
     url(r'^$', views.index,name='index'),
+    url(r'^logout',views.signout,name='logout'),
+
+    url(r'^systemStat',views.systemStat,name='sysstat')
 ]

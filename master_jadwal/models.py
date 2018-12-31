@@ -13,6 +13,11 @@ class teamTeaching(models.Model):
         on_delete=models.CASCADE,
         null=True
     )
+    subjectId = models.ForeignKey(
+        subject,
+        on_delete=models.CASCADE,
+        null=True
+    )
 
     def __str__(self):
         return "[ %s / %s ] %s " % (self.deptId.name, self.deptId.unit_id.name, self.name)
@@ -32,8 +37,9 @@ class dtTeamTeaching(models.Model):
 
     def __str__(self):
         return "[ %s / %s ] %s - %s %s " % (
-        self.teamId.deptId.name, self.faresUserId.dept_id.unit_id.name, self.teamId.name, self.faresUserId.registred_no,
-        self.faresUserId.full_name)
+            self.teamId.deptId.name, self.faresUserId.dept_id.unit_id.name, self.teamId.name,
+            self.faresUserId.registred_no,
+            self.faresUserId.full_name)
 
 
 class time(models.Model):
@@ -55,7 +61,7 @@ class time(models.Model):
         on_delete=models.CASCADE,
         null=True
     )
-    departement = models.ForeignKey(
+    departementId = models.ForeignKey(
         departement,
         on_delete=models.CASCADE,
         null=True
@@ -63,8 +69,8 @@ class time(models.Model):
 
     def __str__(self):
         days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu']
-        return "[ %s / %s ] %s %s - %s" % (
-        self.departement.name, self.departement.unit_id.name, days[self.day], self.hour_start, self.hour_stop)
+        return "[ %s ] %s %s - %s " % (
+            self.departementId, days[self.day], self.hour_start, self.hour_stop)
 
 
 class subject_offer(models.Model):
@@ -120,8 +126,8 @@ class absence(models.Model):
 
     def __str__(self):
         return "[ %s - %s ] [ %s %s - %s ] - %s " % (
-        self.departement.name, self.departement.unit_id.name, self.subjectOfferId.classRoomId.class_name,
-        self.timeStart, self.timeStop, self.subjectOfferId.subject_id.name)
+            self.departement.name, self.departement.unit_id.name, self.subjectOfferId.classRoomId.class_name,
+            self.timeStart, self.timeStop, self.subjectOfferId.subject_id.name)
 
 
 class dtAbsence(models.Model):

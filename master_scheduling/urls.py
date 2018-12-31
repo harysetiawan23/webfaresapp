@@ -1,7 +1,7 @@
 from django.conf.urls import url
-from . import views
+from .views import controlStudentClass
 
 urlpatterns = [
-    url(r'^schedule', views.scheduleClass, name='schedule'),
-    url(r'^kelas-pelajar', views.studentClass,name='kelas-pelajar'),
+    url(r'^kelas', controlStudentClass.scheduleClass, name='kelas'),
+    url(r'^pelajar$', controlStudentClass.studentClass,name='kelas-pelajar'),
 ]

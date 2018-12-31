@@ -1,6 +1,7 @@
 <div class="sidebar">
     <nav class="sidebar-nav">
         <ul class="nav">
+
             {# DASHBOARD #}
             <li class="nav-item">
                 <a class="nav-link" href="/">
@@ -8,6 +9,7 @@
                     <span class="badge badge-primary"></span>
                 </a>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link" href="/jadwal">
                     <i class="nav-icon icon-calendar"></i> Manajemen Jadwal
@@ -15,7 +17,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'kelas-pelajar' %}">
+                <a class="nav-link" href="{% url 'kelas' %}">
                     <i class="nav-icon icon-settings"></i> Manajemen Kelas
                     <span class="badge badge-primary"></span>
                 </a>
@@ -60,6 +62,8 @@
                 <a class="nav-link" href="{% url 'master-ruang' %}">
                     <i class="nav-icon icon-bag"></i> Ruang</a>
             </li>
+
+
         </ul>
     </nav>
     <button class="sidebar-minimizer brand-minimizer" type="button"></button>

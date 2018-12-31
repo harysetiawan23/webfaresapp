@@ -23,6 +23,11 @@
         $(document).ready(function () {
             $('#data_table').DataTable();
         });
+
+
+        function editData(data) {
+            $('#modalUbah' + data).modal('show');
+        }
     </script>
 {% endblock app_script %}
 
@@ -37,8 +42,21 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-12">
-                            <hr class="mt-0">
 
+                            <!-- /.col-->
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="callout callout-danger">
+                                    <small class="text-muted">Pelajaran</small>
+                                    <br>
+                                    <strong class="h4">{{ pelajaranCount }}</strong>
+                                    <div class="chart-wrapper">
+                                        <canvas id="sparkline-chart-2" width="100" height="30"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <hr class="mt-0">
                             <div class="row">
                                 <div class="col">
                                     <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -58,116 +76,110 @@
                                         </div>
                                         <div class="card-body">
                                             <table id="data_table"
-                                                   class="table table-responsive-sm table-sm table-striped">
+                                                   class="table table-responsive-sm table-sm table-hover table-striped">
                                                 <thead>
 
                                                 <tr>
                                                     <th>ID</th>
                                                     <th>Mata Pelajaran</th>
                                                     <th>Deskripsi</th>
-                                                    <th>Status</th>
                                                 </tr>
 
 
                                                 </thead>
                                                 <tbody>
                                                 {% for datum in data %}
-                                                    <tr>
+                                                    <tr onclick="editData({{ datum.pk }})">
                                                         <td>{{ datum.subject_id }}</td>
                                                         <td>{{ datum.name }}</td>
                                                         <td>{{ datum.detail }}</td>
-                                                        <td>
-                                                            <button class="btn btn-sm btn-ghost-success"
-                                                                    data-toggle="modal"
-                                                                    data-target="#modalUbah{{ datum.pk }}">
-                                                                <i class="fa fa-edit"></i> Edit
-                                                            </button>
 
-                                                            {#  Modal Ubah Pelajaran  #}
-                                                            <div class="modal fade" id="modalUbah{{ datum.pk }}"
-                                                                 tabindex="-1"
-                                                                 role="dialog"
-                                                                 aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                                                <div class="modal-dialog" role="document">
-                                                                    <div class="modal-content">
-                                                                        <form method="post"
-                                                                              action="{% url 'update-pelajaran' %}">
-                                                                            <div class="modal-header">
-                                                                                <h5 class="modal-title"
-                                                                                    id="exampleModalLabel">Ubah
-                                                                                    Pelajaran</h5>
-                                                                                <button type="button" class="close"
-                                                                                        data-dismiss="modal"
-                                                                                        aria-label="Close">
-                                                                                    <span aria-hidden="true">&times;</span>
-                                                                                </button>
+
+                                                        {#  Modal Ubah Pelajaran  #}
+                                                        <div class="modal fade" id="modalUbah{{ datum.pk }}"
+                                                             tabindex="-1"
+                                                             role="dialog"
+                                                             aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                            <div class="modal-dialog" role="document">
+                                                                <div class="modal-content">
+                                                                    <form method="post"
+                                                                          action="{% url 'update-pelajaran' %}">
+                                                                        <div class="modal-header">
+                                                                            <h5 class="modal-title"
+                                                                                id="exampleModalLabel">Ubah
+                                                                                Pelajaran</h5>
+                                                                            <button type="button" class="close"
+                                                                                    data-dismiss="modal"
+                                                                                    aria-label="Close">
+                                                                                <span aria-hidden="true">&times;</span>
+                                                                            </button>
+                                                                        </div>
+                                                                        <div class="modal-body">
+                                                                            {% csrf_token %}
+                                                                            <div class="form-group">
+                                                                                <input class="form-control"
+                                                                                       id="deptId" name="deptId"
+                                                                                       type="hidden" required
+                                                                                       value="{{ deptId }}">
+                                                                                <input class="form-control"
+                                                                                       id="subjectPk"
+                                                                                       name="subjectPk"
+                                                                                       type="hidden" required
+                                                                                       value="{{ datum.pk }}">
+                                                                                <label for="registerno">Reg.
+                                                                                    ID</label>
+                                                                                <input class="form-control"
+                                                                                       id="subjectId"
+                                                                                       name="subjectId"
+                                                                                       type="text" required
+                                                                                       value="{{ datum.subject_id }}">
                                                                             </div>
-                                                                            <div class="modal-body">
-                                                                                {% csrf_token %}
-                                                                                <div class="form-group">
-                                                                                    <input class="form-control"
-                                                                                           id="deptId" name="deptId"
-                                                                                           type="hidden" required
-                                                                                           value="{{ deptId }}">
-                                                                                    <input class="form-control"
-                                                                                           id="subjectPk"
-                                                                                           name="subjectPk"
-                                                                                           type="hidden" required
-                                                                                           value="{{ datum.pk }}">
-                                                                                    <label for="registerno">Reg.
-                                                                                        ID</label>
-                                                                                    <input class="form-control"
-                                                                                           id="subjectId"
-                                                                                           name="subjectId"
-                                                                                           type="text" required
-                                                                                           value="{{ datum.subject_id }}">
-                                                                                </div>
-                                                                                <div class="form-group">
-                                                                                    <label for="fullname">Pelajaran</label>
-                                                                                    <input class="form-control"
-                                                                                           id="subjectName"
-                                                                                           name="subjectName"
-                                                                                           type="text"
-                                                                                           value="{{ datum.name }}"
-                                                                                           required>
-                                                                                </div>
-                                                                                <div class="form-group">
-                                                                                    <label for="detail">Detail</label>
-                                                                                    <textarea class="form-control"
-                                                                                              id="detail"
-                                                                                              name="detail">{{ datum.detail }}</textarea>
-                                                                                </div>
+                                                                            <div class="form-group">
+                                                                                <label for="fullname">Pelajaran</label>
+                                                                                <input class="form-control"
+                                                                                       id="subjectName"
+                                                                                       name="subjectName"
+                                                                                       type="text"
+                                                                                       value="{{ datum.name }}"
+                                                                                       required>
                                                                             </div>
-                                                                            <div class="modal-footer">
-                                                                                <button type="button"
-                                                                                        class="btn btn-secondary"
-                                                                                        data-dismiss="modal">
-                                                                                    Close
-                                                                                </button>
-                                                                                <button class="btn btn-success"
-                                                                                        type="submit"
-                                                                                        data-toggle="collapse"
-                                                                                        onclick="return confirm('Data akan diubah, Lanjutkan?');"
-                                                                                        data-target="#collapseExample"
-                                                                                        aria-expanded="false"
-                                                                                        aria-controls="collapseExample">
-                                                                                    <i class="fa fa-save"></i> Simpan
-                                                                                </button>
+                                                                            <div class="form-group">
+                                                                                <label for="detail">Detail</label>
+                                                                                <textarea class="form-control"
+                                                                                          id="detail"
+                                                                                          name="detail">{{ datum.detail }}</textarea>
                                                                             </div>
-                                                                        </form>
-                                                                    </div>
+                                                                        </div>
+                                                                        <div class="modal-footer">
+                                                                            <button type="button"
+                                                                                    class="btn btn-secondary"
+                                                                                    data-dismiss="modal">
+                                                                                Close
+                                                                            </button>
+
+
+                                                                            {#  Modal Delete #}
+                                                                            <a href="{% url 'drop-pelajaran' %}?subjectPk={{ datum.pk }}"
+                                                                               class="btn btn-danger"
+                                                                               onclick="return confirm('Data akan dihapus, Lanjutkan?');">
+                                                                                <i class="fa fa-trash"></i> Hapus
+                                                                            </a>
+
+                                                                            <button class="btn btn-success"
+                                                                                    type="submit"
+                                                                                    data-toggle="collapse"
+                                                                                    onclick="return confirm('Data akan diubah, Lanjutkan?');"
+                                                                                    data-target="#collapseExample"
+                                                                                    aria-expanded="false"
+                                                                                    aria-controls="collapseExample">
+                                                                                <i class="fa fa-save"></i> Simpan
+                                                                            </button>
+                                                                        </div>
+                                                                    </form>
                                                                 </div>
                                                             </div>
+                                                        </div>
 
-
-                                                            {#  Modal Delete #}
-                                                            <a href="{% url 'drop-pelajaran' %}?subjectPk={{ datum.pk }}"
-                                                               class="btn btn-sm btn-ghost-danger"
-                                                               onclick="return confirm('Data akan dihapus, Lanjutkan?');">
-                                                                <i class="fa fa-trash"></i> Hapus
-                                                            </a>
-
-                                                        </td>
                                                     </tr>
                                                 {% endfor %}
                                                 </tbody>

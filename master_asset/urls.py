@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from .views import controlRuang, controlPelajaran, controlPelajar, controlPengajar,master_user
+from .views import controlRuang, controlPelajaran, controlPelajar, controlPengajar
 
 urlpatterns = [
     url(r'^pelajar/', controlPelajar.master_pelajar, name='master-pelajar'),
@@ -19,7 +19,5 @@ urlpatterns = [
     url(r'^store-ruang', controlRuang.storeRuang, name='store-ruang'),
     url(r'^update-ruang', controlRuang.updateRuang, name='update-ruang'),
     url(r'^drop-ruang$', controlRuang.dropRuang, name='drop-ruang'),
-
-    url(r'^user/', master_user, name='master-user'),
 
 ]
