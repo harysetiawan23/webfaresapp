@@ -1,0 +1,211 @@
+{% extends "layout/base.html" %}
+{% load static %}
+
+
+{% block app_css %}
+    <link rel="stylesheet" type="text/css" href="{% static "vendors/data-tables/datatables.css" %}"/>
+{% endblock app_css %}
+
+{% block current_page_indicator %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap-theme/0.1.0-beta.10/select2-bootstrap.min.css"
+          rel="stylesheet"/>
+{% endblock %}
+
+{% block breadcumb %}
+    <ol class="breadcrumb">
+        {% for link,name in breadcumbs %}
+            <li class="breadcrumb-item"><a href="{{ link }}">{{ name }}</a></li>
+        {% endfor %}
+    </ol>
+{% endblock breadcumb %}
+
+
+{% block app_script %}
+    <script type="text/javascript" charset="utf8"
+            src="{% static "vendors/data-tables/datatables.min.js" %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+    <script>
+        $("#data_master").addClass("active")
+
+        $(document).ready(function () {
+            $('#data_table').DataTable();
+            $('#pelajar').select2({
+                theme: 'bootstrap'
+            });
+        });
+
+        $('#edit').onclick(function () {
+            alert("EDITED CLICKED")
+        })
+    </script>
+
+{% endblock app_script %}
+
+
+{% block container %}
+    <!-- /.row-->
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="card">
+                <div class="card-header">Kelas Pelajar</div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="row">
+                                <div class="col-lg-2 col-sm-2">
+                                    <div class="callout callout-info">
+                                        <small class="text-muted">Pelajar</small>
+                                        <br>
+                                        <strong class="h4">{{ studentClassDataCount }}</strong>
+                                        <div class="chart-wrapper">
+                                            <canvas id="sparkline-chart-1" width="100" height="30"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <!-- /.col-->
+                            </div>
+                            <hr class="mt-0">
+
+                            <div class="row">
+                                <div class="col">
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            data-target="#modalTambah">
+                                        <i class="fa fa-plus"></i> Tambah Pelajar
+                                    </button>
+
+                                </div>
+                            </div>
+                            <br/>
+                            <hr class="mt-0">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <i class="fa fa-align-justify"></i> Kelas Pelajar
+                                        </div>
+                                        <div class="card-body">
+                                            <table id="data_table"
+                                                   class="table table-responsive-sm table-sm">
+                                                <thead>
+
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Nama</th>
+                                                    <th>Kelas</th>
+                                                    <th>Mulai</th>
+                                                    <th>Selesai</th>
+                                                    <th>Pelajaran</th>
+                                                    <th>Team</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+
+
+                                                </thead>
+                                                <tbody>
+                                                {% for datum in data %}
+                                                    <tr>
+                                                        <td>{{ datum.studentId.registred_no }}</td>
+                                                        <td>{{ datum.studentId.full_name }}</td>
+                                                        <td>{{ datum.subjectOfferId.classRoomId.class_name }}</td>
+                                                        <td>{{ datum.subjectOfferId.time_id.hour_start }}</td>
+                                                        <td>{{ datum.subjectOfferId.time_id.hour_stop }}</td>
+                                                        <td>{{ datum.subjectOfferId.subject_id.name }}</td>
+                                                        <td>{{ datum.subjectOfferId.teamTeaching_id.name }}</td>
+                                                        <td>
+                                                            <button class="btn btn-sm btn-ghost-success"><i
+                                                                    class="fa fa-edit"></i> Edit
+                                                            </button>
+                                                            <button class="btn btn-sm btn-ghost-danger"><i
+                                                                    class="fa fa-trash"></i> Hapus
+                                                            </button>
+                                                        </td>
+
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-4">
+                                    {% for datum in data %}
+                                        <div class="collapse" id="{{ datum.pilot }}">
+                                            <div class="card card-body">Anim pariatur cliche reprehenderit, enim eiusmod
+                                                high
+                                                life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica,
+                                                craft
+                                                beer labore wes anderson cred nesciunt sapiente ea proident.
+                                            </div>
+                                        </div>
+
+                                    {% endfor %}
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
+    {#  Modal Tambah Jam  #}
+    <div class="modal fade" id="modalTambah" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form method="post" action="{% url 'store-jam' %}">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Registrasi Pelajar</h5>
+                        <button type="button" class="close" data-dismiss="modal"
+                                aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <input class="form-control" id="deptId" name="deptId"
+                                   type="hidden" required
+                                   value="{{ deptId }}">
+                            <label for="registerno"></label>
+                            <label for="pelajar">Hari</label>
+                            <select id="pelajar" name="pelajar[]"
+                                    multiple="multiple">
+                                {% for datum in allStudent %}
+                                    <option value="{{ datum.pk }}">{{ datum.registred_no }} - {{ datum.full_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                                data-dismiss="modal">
+                            Close
+                        </button>
+                        <button class="btn btn-success" type="submit"
+                                data-toggle="collapse"
+                                data-target="#collapseExample" aria-expanded="false"
+                                aria-controls="collapseExample">
+                            <i class="fa fa-save"></i> Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock container %}
