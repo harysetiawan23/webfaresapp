@@ -20,14 +20,14 @@ class teamTeaching(models.Model):
     )
 
     def __str__(self):
-        return "[ %s / %s ] %s " % (self.deptId.name, self.deptId.unit_id.name, self.name)
+        return "[ %s / %s ] %s %s " % (self.deptId.name, self.deptId.unit_id.name, self.pk, self.name)
 
 
 class dtTeamTeaching(models.Model):
     teamId = models.ForeignKey(
         teamTeaching,
-        null=True,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True
     )
     faresUserId = models.ForeignKey(
         FaresUser,

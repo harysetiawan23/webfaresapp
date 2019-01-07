@@ -11,36 +11,23 @@ from rest_framework.status import (
 )
 from rest_framework.response import Response
 from django.urls import reverse
-from django.http import HttpResponseRedirect, HttpResponse,JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from master_user.models import FaresUser
+from django.core.serializers import serialize
+from django.core import serializers
 import psutil
+import json
 
 
 @login_required
 def index(request):
     currentUser = FaresUser.objects.get(pk=str(request.session['userId']))
 
-    mem = psutil.virtual_memory()
-    memoryUtils = {
-        'percent': mem.percent,
-        'av': "%0.2f" % (mem.available / (1024 * 1024 * 1024)),
-        'tot': "%0.2f" % (mem.total / (1024 * 1024 * 1024))
-    }
-
-    disk = psutil.disk_usage('/')
-    diskUtils = {
-        'percent': disk.percent,
-        'used': "%0.2f" % (disk.used / (1024 * 1024 * 1024)),
-        'tot': "%0.2f" % (disk.total / (1024 * 1024 * 1024))
-    }
-
     context = {
         'title': 'Dashboard',
         'session': currentUser,
-        'cpu': psutil.cpu_percent(interval=None),
-        'mem': memoryUtils,
-        'disk': diskUtils
+        'cpu': psutil.cpu_percent(interval=None)
     }
     return render(request, "index.html", context)
 
@@ -64,9 +51,9 @@ def systemStat(request):
         'title': 'Dashboard',
         'cpu': psutil.cpu_percent(interval=None),
         'mem': memoryUtils,
-        'disk': diskUtils
+        'disk': diskUtils,
     }
-    return JsonResponse(context)
+    return JsonResponse(context, content_type='application/json')
 
 
 @login_required
@@ -103,18 +90,17 @@ def login_api(request):
 
     USERDATA = {
         'status': True,
-        'user': {
-            'name': str(userData.full_name),
-            'reg_no': str(userData.registred_no),
-            'dateOfBirth': str(userData.date_of_birth)
-        },
-        'token': token.key
+        'token': token.key,
+        'userPk': token.user.pk
     }
 
-    return Response(USERDATA, status=HTTP_200_OK)
+    return HttpResponse(json.dumps(USERDATA), content_type='application/json')
 
 
 @csrf_exempt
-@api_view(['GET'])
+@api_view(['POST'])
 def simpleData(request):
-    return Response({'data': 'Hell yeah Success'}, status=HTTP_200_OK)
+    return HttpResponse(
+        serializers.serialize("json", [FaresUser.objects.get(pk=request.POST['userPk']),]),
+        content_type="application/json"
+    )

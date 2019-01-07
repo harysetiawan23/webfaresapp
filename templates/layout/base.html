@@ -58,7 +58,7 @@
 
 
 </head>
-<body class="app header-fixed sidebar-fixed aside-menu-fixed pace-done sidebar-lg-show">
+<body class="app header-fixed sidebar-fixed sidebar-minimized aside-menu-fixed pace-done sidebar-lg-show">
 
 
 {% include "snippets/header.html" %}
@@ -493,6 +493,8 @@
 
                 $("#mem_process").css('width', data.mem.percent + '%');
                 $("#memload").html("Free " + data.mem.av + ' GB / ' + data.mem.tot + 'GB');
+
+
 
 
             }

@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^update-teaching', controlTeamTeaching.updateTeamTeaching, name='update-teaching'),
     url(r'^drop-teaching$', controlTeamTeaching.dropTeamTeaching, name='drop-teaching'),
 
+    url(r'^teaching',controlTeamTeaching.dtTeamTeaching,name='dt-team-teaching'),
     url(r'^store-teacher-team-teaching', controlTeamTeaching.storeTeacherTeamTeaching, name='store-teacher-team'),
     url(r'^drop-teacher-team-teaching$', controlTeamTeaching.dropTeacherTeamTeaching, name='drop-teacher-team'),
 

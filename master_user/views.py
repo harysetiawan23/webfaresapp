@@ -17,14 +17,15 @@ def login_user(request):
         password = request.POST["password"]
 
         user = authenticate(username=username, password=password)
-        if user is not None:
+        if user is not None and user.is_staff == 1:
             login(request, user)
             userData = FaresUser.objects.get(pk=str(user))
             request.session['userId'] = str(userData.pk)
             print("USER TRUE")
             return HttpResponseRedirect(reverse('index'))
         else:
-            print("USER FALSE")
+            print('Bukan Staff')
+            return HttpResponseRedirect(reverse('login'))
 
     return render(request, 'registration/login.html')
 

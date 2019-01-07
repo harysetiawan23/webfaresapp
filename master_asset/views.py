@@ -3,7 +3,6 @@ from django.shortcuts import render, HttpResponseRedirect, reverse
 from .models import subject, classRoom
 from master_user.models import FaresUser
 from django.contrib.auth.decorators import login_required
-import psutil
 
 
 class controlPelajar():
@@ -11,22 +10,8 @@ class controlPelajar():
     # Create your views here.
     @login_required
     def master_pelajar(request):
-        mem = psutil.virtual_memory()
-        memoryUtils = {
-            'percent': mem.percent,
-            'av': "%0.2f" % (mem.available / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (mem.total / (1024 * 1024 * 1024))
-        }
-
-        disk = psutil.disk_usage('/')
-        diskUtils = {
-            'percent': disk.percent,
-            'used': "%0.2f" % (disk.used / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (disk.total / (1024 * 1024 * 1024))
-        }
-
         userData = FaresUser.objects.get(pk=str(request.session['userId']))
-        studetData = FaresUser.objects.filter(dept_id=str(userData.dept_id.id)).filter(isTeacher=False)
+        studetData = FaresUser.objects.filter(dept_id=str(userData.dept_id.id)).filter(isTeacher=False).filter(is_staff=False)
         countMale = len(studetData.filter(gender=1))
         countFemale = len(studetData.filter(gender=2))
         try:
@@ -40,8 +25,8 @@ class controlPelajar():
 
         context = {
             'breadcumbs': [
-                ['/', 'Home'],
-                ['/master/pelajar', 'Master Pelajar']
+                ['/', 'Assets'],
+                ['/master/pelajar', 'Pelajar']
             ],
             'title': "Master Pelajar",
             'session': userData,
@@ -52,9 +37,6 @@ class controlPelajar():
             'percentMale': percentMale,
             'percentFemale': percentFemale,
             'deptId': userData.dept_id.id,
-            'cpu': psutil.cpu_percent(interval=None),
-            'mem': memoryUtils,
-            'disk':diskUtils
 
         }
 
@@ -66,34 +48,20 @@ class controlPelajaran():
     @login_required
     def master_pelajaran(request):
 
-        mem = psutil.virtual_memory()
-        memoryUtils = {
-            'percent': mem.percent,
-            'av': "%0.2f" % (mem.available / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (mem.total / (1024 * 1024 * 1024))
-        }
-        disk = psutil.disk_usage('/')
-        diskUtils = {
-            'percent': disk.percent,
-            'used': "%0.2f" % (disk.used / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (disk.total / (1024 * 1024 * 1024))
-        }
 
         userData = FaresUser.objects.get(pk=str(request.session['userId']))
         subjectData = subject.objects.filter(dept_id=userData.dept_id.id)
         context = {
             'breadcumbs': [
-                ['/', 'Home'],
-                ['/master/pelajaran', 'Master Pelajaran']
+                ['/', 'Assets'],
+                ['/master/pelajaran', 'Pelajaran']
             ],
             'title': "Master Pelajaran",
             'session': userData,
             'data': subjectData,
             'pelajaranCount':len(subjectData),
             'deptId': userData.dept_id.id,
-            'cpu': psutil.cpu_percent(interval=None),
-            'mem': memoryUtils,
-            'disk':diskUtils
+
         }
         return render(request, "asset-view/master-pelajaran.html", context)
 
@@ -142,21 +110,8 @@ class controlPengajar():
     @login_required
     def master_pengajar(request):
 
-        mem = psutil.virtual_memory()
-        memoryUtils = {
-            'percent': mem.percent,
-            'av': "%0.2f" % (mem.available / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (mem.total / (1024 * 1024 * 1024))
-        }
-        disk = psutil.disk_usage('/')
-        diskUtils = {
-            'percent': disk.percent,
-            'used': "%0.2f" % (disk.used / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (disk.total / (1024 * 1024 * 1024))
-        }
-
         userData = FaresUser.objects.get(pk=str(request.session['userId']))
-        pengajar = FaresUser.objects.filter(isTeacher=True).filter(dept_id=str(userData.dept_id.id))
+        pengajar = FaresUser.objects.filter(isTeacher=True).filter(dept_id=str(userData.dept_id.id)).filter(is_staff=False)
         countMale = len(pengajar.filter(gender=1))
         countFemale = len(pengajar.filter(gender=2))
         try:
@@ -170,8 +125,8 @@ class controlPengajar():
 
         context = {
             'breadcumbs': [
-                ['/', 'Home'],
-                ['/master/pengajar', 'Master Pengajar']
+                ['/', 'Assets'],
+                ['/master/pengajar', 'Pengajar']
             ],
             'title': "Master Pengajar",
             'session': userData,
@@ -182,9 +137,6 @@ class controlPengajar():
             'percentMale': percentMale,
             'percentFemale': percentFemale,
             'deptId': userData.dept_id.id,
-            'cpu': psutil.cpu_percent(interval=None),
-            'mem': memoryUtils,
-            'disk':diskUtils
         }
         return render(request, "asset-view/master-pengajar.html", context)
 
@@ -230,36 +182,19 @@ class controlRuang():
 
     @login_required
     def master_ruang(request):
-
-        mem = psutil.virtual_memory()
-        memoryUtils = {
-            'percent': mem.percent,
-            'av': "%0.2f" % (mem.available / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (mem.total / (1024 * 1024 * 1024))
-        }
-        disk = psutil.disk_usage('/')
-        diskUtils = {
-            'percent': disk.percent,
-            'used': "%0.2f" % (disk.used / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (disk.total / (1024 * 1024 * 1024))
-        }
-
         userData = FaresUser.objects.get(pk=str(request.session['userId']))
         dataRuang = classRoom.objects.filter(departement=str(userData.dept_id_id))
         dataRuangCount = len(dataRuang)
         context = {
             'breadcumbs': [
-                ['/', 'Home'],
-                ['/master/ruang', 'Master Ruang']
+                ['/', 'Assets'],
+                ['/', 'Ruang Belajar']
             ],
             'title': "Master Ruang",
             'session': userData,
             'dataRuang': dataRuang,
             'deptId': userData.dept_id_id,
             'totalRuang': dataRuangCount,
-            'cpu': psutil.cpu_percent(interval=None),
-            'mem': memoryUtils,
-            'disk':diskUtils
         }
         return render(request, "asset-view/master-ruang.html", context)
 

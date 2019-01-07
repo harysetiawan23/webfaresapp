@@ -4,7 +4,6 @@ from .models import teamTeaching, dtTeamTeaching, shift, subject_offer, time, su
 from master_asset.models import classRoom
 from master_user.models import FaresUser
 from django.contrib.auth.decorators import login_required
-import psutil
 
 
 # Create your views here.
@@ -12,23 +11,8 @@ import psutil
 
 class controlSubjectOffer():
 
-
     @login_required
     def masterSubjectOffer(request):
-
-        mem = psutil.virtual_memory()
-        memoryUtils = {
-            'percent': mem.percent,
-            'av': "%0.2f" % (mem.available / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (mem.total / (1024 * 1024 * 1024))
-        }
-        disk = psutil.disk_usage('/')
-        diskUtils = {
-            'percent': disk.percent,
-            'used': "%0.2f" % (disk.used / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (disk.total / (1024 * 1024 * 1024))
-        }
-
         userData = FaresUser.objects.get(pk=str(request.session['userId']))
         subjectOfferData = subject_offer.objects.filter(departement_id=userData.dept_id_id)
         teamTeachingData = teamTeaching.objects.filter(deptId_id=str(userData.dept_id_id))
@@ -39,8 +23,8 @@ class controlSubjectOffer():
         context = {
             'title': 'Penawaran Mata Pelajaran',
             'breadcumbs': [
-                ['/', 'Home'],
-                ['/jadwal/penawaran', 'Penawaran Mata Pelajaran']
+                ['/', 'Jadwal'],
+                ['/', 'Penawaran']
             ],
             'data': subjectOfferData,
             'session': userData,
@@ -51,9 +35,6 @@ class controlSubjectOffer():
             'daySelect': time.DAYS,
             'dataRuang': dataRuang,
             'deptId': userData.dept_id_id,
-            'cpu': psutil.cpu_percent(interval=None),
-            'mem': memoryUtils,
-            'disk':diskUtils
 
         }
         return render(request, "jadwal-view/master-subject-offer.html", context)
@@ -100,22 +81,8 @@ class controlSubjectOffer():
 
 class controlTeamTeaching():
 
-
     @login_required
     def masterTeamTeaching(request):
-
-        mem = psutil.virtual_memory()
-        memoryUtils = {
-            'percent': mem.percent,
-            'av': "%0.2f" % (mem.available / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (mem.total / (1024 * 1024 * 1024))
-        }
-        disk = psutil.disk_usage('/')
-        diskUtils = {
-            'percent': disk.percent,
-            'used': "%0.2f" % (disk.used / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (disk.total / (1024 * 1024 * 1024))
-        }
 
         userData = FaresUser.objects.get(pk=str(request.session['userId']))
         teamData = teamTeaching.objects.filter(deptId_id=str(userData.dept_id_id))
@@ -127,8 +94,8 @@ class controlTeamTeaching():
         context = {
             'title': 'Team Teaching',
             'breadcumbs': [
-                ['/', 'Home'],
-                ['/jadwal/team-teaching', 'Team Teaching']
+                ['/', 'Jadwal'],
+                ['/', 'Team Teaching']
             ],
             'teamData': teamData,
             'session': userData,
@@ -137,9 +104,7 @@ class controlTeamTeaching():
             'teamCount': teamTeachingCount,
             'deptId': userData.dept_id_id,
             'subject': subjectData,
-            'cpu': psutil.cpu_percent(interval=None),
-            'mem': memoryUtils,
-            'disk':diskUtils
+
         }
         return render(request, "jadwal-view/master-team-teaching.html", context)
 
@@ -172,14 +137,44 @@ class controlTeamTeaching():
             return HttpResponseRedirect(reverse('team-teaching'))
 
     @login_required
+    def dtTeamTeaching(request):
+        if request.GET:
+            teamId = request.GET['id']
+            userData = FaresUser.objects.get(pk=str(request.session['userId']))
+            dtTeamData = dtTeamTeaching.objects.filter(teamId=teamId)
+            teamTeachingData = teamTeaching.objects.get(pk=teamId)
+            teacherList = FaresUser.objects.filter(isTeacher=True).filter(dept_id_id=userData.dept_id_id)
+            teamDataCount = len(dtTeamData)
+            subjectData = subject.objects.filter(dept_id_id=str(userData.dept_id_id))
+
+            context = {
+                'title': 'Team Teaching',
+                'breadcumbs': [
+                    ['/', 'Jadwal'],
+                    ['/', 'Team Teaching'],
+                    [request.META.get('HTTP_REFERER', '/'), teamTeachingData.name]
+                ],
+                'teamTeaching':teamTeachingData,
+                'teamData': dtTeamData,
+                'session': userData,
+                'teacherList': teacherList,
+                'teamCount': teamDataCount,
+                'teamTeachingPk': teamId,
+                'subject': subjectData,
+            }
+        return render(request, "jadwal-view/master-team-teaching_personel.html", context)
+
+    @login_required
     def storeTeacherTeamTeaching(request):
         if request.POST:
-            teacherTeamTeaching = dtTeamTeaching.objects.create()
-            teacherTeamTeaching.teamId_id = request.POST['teamTeachingPk']
-            teacherTeamTeaching.faresUserId_id = request.POST['teacherPk']
-            teacherTeamTeaching.save()
-
-            return HttpResponseRedirect(reverse('team-teaching'))
+            for teacherPk in request.POST.getlist('teacherPk[]'):
+                print('team Teaching Pk : ' + request.POST['teamTeachingPk'])
+                print('teacher Pk : ' + teacherPk)
+                teacherTeamTeaching = dtTeamTeaching.objects.create()
+                teacherTeamTeaching.teamId_id = request.POST['teamTeachingPk']
+                teacherTeamTeaching.faresUserId_id = teacherPk
+                teacherTeamTeaching.save()
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
     @login_required
     def dropTeacherTeamTeaching(request):
@@ -187,44 +182,27 @@ class controlTeamTeaching():
             teacherTeamTeaching = dtTeamTeaching.objects.get(pk=str(request.GET['teacherTeachingPk']))
             teacherTeamTeaching.delete()
 
-            return HttpResponseRedirect(reverse('team-teaching'))
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER', '/'))
 
 
 class controlShiftKelas():
 
-
     @login_required
     def masterJenisKelas(request):
-
-        mem = psutil.virtual_memory()
-        memoryUtils = {
-            'percent': mem.percent,
-            'av': "%0.2f" % (mem.available / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (mem.total / (1024 * 1024 * 1024))
-        }
-        disk = psutil.disk_usage('/')
-        diskUtils = {
-            'percent': disk.percent,
-            'used': "%0.2f" % (disk.used / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (disk.total / (1024 * 1024 * 1024))
-        }
-
         userData = FaresUser.objects.get(pk=str(request.session['userId']))
         shiftData = shift.objects.filter(departement_id=str(userData.dept_id_id))
         shiftCount = len(shiftData)
         context = {
             'title': 'Jenis Kelas',
             'breadcumbs': [
-                ['/', 'Home'],
-                ['/jadwal/jenis-kelas', 'Jenis Kelas']
+                ['/', 'Jadwal'],
+                ['/', 'Shift']
             ],
             'data': shiftData,
             'session': userData,
             'shiftCount': shiftCount,
             'deptId': userData.dept_id_id,
-            'cpu': psutil.cpu_percent(interval=None),
-            'mem': memoryUtils,
-            'disk':diskUtils
+
         }
         return render(request, "jadwal-view/master-shift-kelas.html", context)
 
@@ -259,27 +237,14 @@ class controlJamPelajaran():
     @login_required
     def masterJamPelajaran(request):
 
-        mem = psutil.virtual_memory()
-        memoryUtils = {
-            'percent': mem.percent,
-            'av': "%0.2f" % (mem.available / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (mem.total / (1024 * 1024 * 1024))
-        }
-        disk = psutil.disk_usage('/')
-        diskUtils = {
-            'percent': disk.percent,
-            'used': "%0.2f" % (disk.used / (1024 * 1024 * 1024)),
-            'tot': "%0.2f" % (disk.total / (1024 * 1024 * 1024))
-        }
-
         userData = FaresUser.objects.get(pk=str(request.session['userId']))
         jamPelajaranData = time.objects.filter(departementId_id=str(userData.dept_id_id))
         jamPelajaranDataCount = len(jamPelajaranData)
         context = {
             'title': 'Jam Pelajaran',
             'breadcumbs': [
-                ['/', 'Home'],
-                ['/jadwal/jam', 'Jam Pelajaran']
+                ['/', 'Jadwal'],
+                ['/', 'Jam Pelajaran']
             ],
             'hari': time.DAYS,
             'session': userData,
@@ -287,9 +252,6 @@ class controlJamPelajaran():
             'data': jamPelajaranData.order_by('day'),
             'deptId': userData.dept_id_id,
             'jamPelajaranDataCount': jamPelajaranDataCount,
-            'cpu': psutil.cpu_percent(interval=None),
-            'mem': memoryUtils,
-            'disk': diskUtils
 
         }
         return render(request, "jadwal-view/master-jam-pelajaran.html", context)
